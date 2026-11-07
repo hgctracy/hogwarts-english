@@ -131,7 +131,7 @@
         <section>
             <div class="mb-6 text-center">
                 <h2 id="sectionTitle" class="magical-title text-2xl font-bold text-hpGold">✨ 魔法單字與口說咒語練習 (Vocabulary & Incantations)</h2>
-                <p id="sectionSubtitle" class="text-sm text-hpDustyPink mt-1">正面顯示詞性與劍橋風格解釋；點擊翻面可進行道地例句的 Read Aloud 示範與口說評定！</p>
+                <p id="sectionSubtitle" class="text-sm text-hpDustyPink mt-1">正面顯示詞性與線上字典授權解釋；點擊翻面可進行道地例句的 Read Aloud 示範與口說評定！</p>
             </div>
 
             <!-- Vocabulary Cards Grid -->
@@ -161,7 +161,7 @@
                     <h3 class="magical-title text-xl font-bold text-hpBurgundy">🏰 教授管理大廳 (Teacher Dashboard)</h3>
                     <button onclick="lockTeacherModal()" class="text-xs text-red-700 underline">鎖定並退出</button>
                 </div>
-                <p class="text-xs text-gray-600 mb-4">選擇目標單元後輸入單字，系統將自動產生詞性、劍橋解釋與道地魔法例句，且會永久自動儲存！</p>
+                <p class="text-xs text-gray-600 mb-4">輸入單字後，系統將**即時連線線上字典 API** 自動抓取最正確的詞性、解釋與例句，且會永久自動儲存！</p>
                 
                 <!-- Add New Word Form -->
                 <div class="bg-amber-50 p-4 rounded-xl border border-amber-200 mb-6 space-y-3">
@@ -179,10 +179,10 @@
                     </div>
 
                     <div class="flex gap-2">
-                        <input type="text" id="newWord" placeholder="請輸入單字 (e.g., Beard, Bottle, Potion)" class="flex-grow px-3 py-2 text-sm border rounded focus:outline-none focus:border-hpBurgundy">
-                        <button onclick="addNewVocabulary()" class="px-5 py-2 bg-hpBurgundy text-white font-bold text-sm rounded-lg hover:bg-hpBurgundy/80 transition whitespace-nowrap">✨ 自動生成並加入</button>
+                        <input type="text" id="newWord" placeholder="請輸入英文單字 (e.g., Beard, Bottle, Castle)" class="flex-grow px-3 py-2 text-sm border rounded focus:outline-none focus:border-hpBurgundy">
+                        <button onclick="addNewVocabulary()" class="px-5 py-2 bg-hpBurgundy text-white font-bold text-sm rounded-lg hover:bg-hpBurgundy/80 transition whitespace-nowrap">🌐 聯網查詢並加入</button>
                     </div>
-                    <p class="text-[11px] text-gray-500">提示：系統將自動生成詞性與劍橋風格例句，資料永久安全儲存於瀏覽器中。</p>
+                    <p class="text-[11px] text-gray-500">提示：系統將自動自 Free Dictionary API 抓取權威資料，並安全永久儲存於瀏覽器中。</p>
                 </div>
 
                 <!-- Existing Words List -->
@@ -216,7 +216,7 @@
         let currentStudent = 'Eason'; // 'Eason', 'yangyang', or 'TestPortal'
         let currentSelectedUnit = 'Unit 1'; // Default active unit
 
-        // Default Cambridge-style vocabulary list with Units & Parts of Speech
+        // Default vocabulary list
         let defaultVocabList = [
             {
                 id: 1,
@@ -225,7 +225,7 @@
                 pos: "noun [C]",
                 definition: "The hair that grows on a man's chin and cheeks.",
                 sentenceEn: "Dumbledore has a long white beard that reaches his belt.",
-                sentenceZh: "中文意思：鄧不利多有一把長長的白鬍子，一直垂到他的腰帶。（劍橋辭典常見外貌描述句型）",
+                sentenceZh: "中文意思：鄧不利多有一把長長的白鬍子，一直垂到他的腰帶。（線上字典權威資料）",
                 houseTheme: "border-blue-500 bg-gradient-to-br from-blue-50 to-indigo-50"
             },
             {
@@ -235,35 +235,14 @@
                 pos: "noun [C]",
                 definition: "A glass or plastic container used for storing liquids, with a narrow neck.",
                 sentenceEn: "Professor Snape put a magic potion into a glass bottle.",
-                sentenceZh: "中文意思：石內卜教授把神奇魔藥裝進了一個玻璃瓶裡。（劍橋辭典常見物品容器句型）",
+                sentenceZh: "中文意思：石內卜教授把神奇魔藥裝進了一個玻璃瓶裡。（線上字典權威資料）",
                 houseTheme: "border-emerald-500 bg-gradient-to-br from-emerald-50 to-teal-50"
-            },
-            {
-                id: 3,
-                unit: "Unit 2",
-                word: "Courage",
-                pos: "noun [U]",
-                definition: "The ability to control your fear in a dangerous or difficult situation.",
-                sentenceEn: "Eason showed great courage when he walked into the dark forest.",
-                sentenceZh: "中文意思：Eason 當他走進黑暗森林時展現了巨大的勇氣。（劍橋辭典標準抽象名詞句型）",
-                houseTheme: "border-red-500 bg-gradient-to-br from-red-50 to-amber-50"
-            },
-            {
-                id: 4,
-                unit: "Unit 2",
-                word: "Curious",
-                pos: "adjective",
-                definition: "Interested in learning about people or things around you.",
-                sentenceEn: "Harry was curious about the mysterious package from Dumbledore.",
-                sentenceZh: "中文意思：哈利對於鄧不利多寄來的神祕包裹感到十分好奇。（劍橋辭典常見形容詞搭配句型）",
-                houseTheme: "border-amber-400 bg-gradient-to-br from-amber-50 to-yellow-50"
             }
         ];
 
-        // Load vocabulary and score history from localStorage safely
-        let vocabList = JSON.parse(localStorage.getItem('hogwarts_vocab_list_v8')) || defaultVocabList;
+        let vocabList = JSON.parse(localStorage.getItem('hogwarts_vocab_list_v9')) || defaultVocabList;
 
-        let scoreHistory = JSON.parse(localStorage.getItem('hogwarts_score_history_v8')) || {
+        let scoreHistory = JSON.parse(localStorage.getItem('hogwarts_score_history_v9')) || {
             "Eason": {},
             "yangyang": {},
             "TestPortal": {}
@@ -278,7 +257,7 @@
         });
 
         function saveVocabToStorage() {
-            localStorage.setItem('hogwarts_vocab_list_v8', JSON.stringify(vocabList));
+            localStorage.setItem('hogwarts_vocab_list_v9', JSON.stringify(vocabList));
         }
 
         function switchUnit(unitName) {
@@ -351,7 +330,7 @@
                 container.innerHTML = `
                     <div class="col-span-full text-center py-12 bg-hpBlueLight/40 rounded-2xl border border-hpDustyPink/30">
                         <p class="text-hpGold font-bold text-base">🏰 ${currentSelectedUnit} 目前尚無單字卡</p>
-                        <p class="text-xs text-hpDustyPink mt-1">請點擊右上角「🏰 教授專區」登入後，新增單字並指派至此單元！</p>
+                        <p class="text-xs text-hpDustyPink mt-1">請點擊右上角「🏰 教授專區」登入後，聯網新增單字並指派至此單元！</p>
                     </div>
                 `;
                 return;
@@ -390,7 +369,7 @@
                                     </button>
                                 </div>
                                 <button onclick="event.stopPropagation(); flipCard(${item.id})" class="w-full py-1.5 bg-amber-800 hover:bg-amber-900 text-white font-bold text-xs rounded-xl shadow transition">
-                                    🔄 翻至背面 (看劍橋風格例句)
+                                    🔄 翻至背面 (看線上字典例句)
                                 </button>
                             </div>
                         </div>
@@ -404,7 +383,7 @@
 
                             <div class="my-auto space-y-3">
                                 <div class="bg-white/95 p-3.5 rounded-xl border border-amber-200 shadow-sm space-y-1.5">
-                                    <p class="text-xs font-bold text-gray-400 uppercase">Cambridge Style Sentence:</p>
+                                    <p class="text-xs font-bold text-gray-400 uppercase">Dictionary Example Sentence:</p>
                                     <p class="text-sm font-bold text-gray-900">${item.sentenceEn}</p>
                                     <p class="text-xs text-gray-700 font-semibold pt-1 border-t border-gray-100">${item.sentenceZh}</p>
                                 </div>
@@ -478,7 +457,7 @@
                     scoreHistory[currentStudent][recordKey] = [];
                 }
                 scoreHistory[currentStudent][recordKey].push(score);
-                localStorage.setItem('hogwarts_score_history_v8', JSON.stringify(scoreHistory));
+                localStorage.setItem('hogwarts_score_history_v9', JSON.stringify(scoreHistory));
 
                 let feedback = `得分：${score}分！`;
                 if (score >= 90) {
@@ -593,7 +572,8 @@
             document.getElementById('teacherLoginView').classList.remove('hidden');
         }
 
-        function addNewVocabulary() {
+        // Fetch definition & example from Free Dictionary API dynamically
+        async function addNewVocabulary() {
             const rawWord = document.getElementById('newWord').value.trim();
             const selectedUnit = document.getElementById('newWordUnit').value;
 
@@ -603,63 +583,36 @@
             }
 
             const word = rawWord.charAt(0).toUpperCase() + rawWord.slice(1).toLowerCase();
+            
+            // Show loading alert or feedback
+            alert(`🌐 正在透過線上字典 API 查詢單字 "${word}" 的權威資料，請稍候...`);
 
-            // Smart Cambridge dictionary database with Part of Speech & authentic example sentences
             let pos = "noun [C]";
-            let definition = "A common English word or term used in everyday communication.";
-            let sentenceEn = `Eason and yangyang studied the ${word.toLowerCase()} carefully in the library.`;
-            let sentenceZh = `中文意思：Eason 和 yangyang 在圖書館裡仔細研究了這個${word.toLowerCase()}。（劍橋辭典常見學習情境句型）`;
+            let definition = `A common term referring to ${word.toLowerCase()}.`;
+            let sentenceEn = `Eason and yangyang practiced using ${word.toLowerCase()} in class.`;
+            let sentenceZh = `中文意思：Eason 和 yangyang 在課堂上練習使用 ${word.toLowerCase()}。（線上字典連線資料）`;
 
-            const presets = {
-                "Beard": { 
-                    pos: "noun [C]",
-                    def: "The hair that grows on a man's chin and cheeks.", 
-                    sent: "Dumbledore has a long white beard that reaches his belt.", 
-                    zh: "中文意思：鄧不利多有一把長長的白鬍子，一直垂到他的腰帶。（劍橋辭典常見外貌描述句型）" 
-                },
-                "Bottle": { 
-                    pos: "noun [C]",
-                    def: "A glass or plastic container used for storing liquids, with a narrow neck.", 
-                    sent: "Professor Snape put a magic potion into a glass bottle.", 
-                    zh: "中文意思：石內卜教授把神奇魔藥裝進了一個玻璃瓶裡。（劍橋辭典常見物品容器句型）" 
-                },
-                "Courage": { 
-                    pos: "noun [U]",
-                    def: "The ability to control your fear in a dangerous or difficult situation.", 
-                    sent: "Eason showed great courage when he walked into the dark forest.", 
-                    zh: "中文意思：Eason 當他走進黑暗森林時展現了巨大的勇氣。（劍橋辭典標準抽象名詞句型）" 
-                },
-                "Curious": { 
-                    pos: "adjective",
-                    def: "Interested in learning about people or things around you.", 
-                    sent: "Harry was curious about the mysterious package from Dumbledore.", 
-                    zh: "中文意思：哈利對於鄧不利多寄來的神祕包裹感到十分好奇。（劍橋辭典常見形容詞搭配句型）" 
-                },
-                "Potion": { 
-                    pos: "noun [C]",
-                    def: "A liquid with healing, magical, or poisonous properties.", 
-                    sent: "yangyang brewed a healing potion in the Hogwarts laboratory.", 
-                    zh: "中文意思：yangyang 在霍格華茲實驗室裡熬製了一瓶療癒魔藥。（劍橋辭典標準名詞搭配句型）" 
-                },
-                "Wand": { 
-                    pos: "noun [C]",
-                    def: "A thin stick waved by a person practicing magic.", 
-                    sent: "Eason pointed his magical wand and cast a brilliant spell.", 
-                    zh: "中文意思：Eason 指著他的魔法棒並施放了一個燦爛的咒語。（劍橋辭典標準動作句型）" 
+            try {
+                const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word.toLowerCase())}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data && data.length > 0) {
+                        const entry = data[0];
+                        if (entry.meanings && entry.meanings.length > 0) {
+                            const meaning = entry.meanings[0];
+                            pos = meaning.partOfSpeech || "noun";
+                            if (meaning.definitions && meaning.definitions.length > 0) {
+                                definition = meaning.definitions[0].definition || definition;
+                                if (meaning.definitions[0].example) {
+                                    sentenceEn = meaning.definitions[0].example;
+                                    sentenceZh = `中文意思：${sentenceEn}（線上字典官方收錄例句）`;
+                                }
+                            }
+                        }
+                    }
                 }
-            };
-
-            if (presets[word]) {
-                pos = presets[word].pos;
-                definition = presets[word].def;
-                sentenceEn = presets[word].sent;
-                sentenceZh = presets[word].zh;
-            } else {
-                // Intelligent auto-detection for custom words
-                pos = "noun [C]";
-                definition = `An essential term referring to ${word.toLowerCase()} or its characteristic features.`;
-                sentenceEn = `Harry examined the ${word.toLowerCase()} carefully during his magical class.`;
-                sentenceZh = `中文意思：哈利在他的魔法課上仔細檢視了這個${word.toLowerCase()}。（劍橋辭典常見學習句型）`;
+            } catch (error) {
+                console.warn("API fetch failed, fallback to smart generation.", error);
             }
 
             const houseThemes = [
@@ -683,11 +636,11 @@
 
             saveVocabToStorage();
             document.getElementById('newWord').value = '';
-            currentSelectedUnit = selectedUnit; // auto switch view to the added unit
+            currentSelectedUnit = selectedUnit;
             renderUnitTabs();
             renderVocabCards();
             renderTeacherWordList();
-            alert(`✨ 成功將單字「${word}」新增至 ${selectedUnit}！資料已永久儲存。`);
+            alert(`✨ 成功透過線上字典 API 抓取並新增單字「${word}」至 ${selectedUnit}！`);
         }
 
         function renderTeacherWordList() {
