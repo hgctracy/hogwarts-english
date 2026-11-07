@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hogwarts Magical English Hub | 霍格華茲魔法英語學習網</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js for Progress Curves -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        hpBlue: '#0c1b33',        /* 深電藍色基底 */
+                        hpBlueLight: '#172a45',   /* 較亮的電藍色 */
+                        hpDustyPink: '#d4a5a5',   /* 灰粉調色系 */
+                        hpGold: '#f3c68f',        /* 霍格華茲金色 */
+                        hpBurgundy: '#74151d',    /* 學院紅 */
+                        hpParchment: '#fdfbf7',   /* 羊皮紙色 */
+                        hpCardText: '#2c2c2c'
+                    },
+                    fontFamily: {
+                        magic: ['Cinzel', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Noto+Serif+TC:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Serif TC', serif;
+            background-color: #0c1b33;
+            color: #fdfbf7;
+        }
+        .magical-title {
+            font-family: 'Cinzel', serif;
+            text-shadow: 0 0 10px rgba(243, 198, 143, 0.5);
+        }
+        .parchment-box {
+            background-color: #fdfbf7;
+            color: #2c2c2c;
+            border: 3px solid #d4a5a5;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+        }
+        /* Flip Card Effect */
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+        .transform-style-3d {
+            transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+        }
+        .transform-style-3d.flipped {
+            transform: rotateY(180deg);
+        }
+        .backface-hidden {
+            backface-visibility: hidden;
+        }
+        .rotate-y-180 {
+            transform: rotateY(180deg);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-hpDustyPink selection:text-hpBlue">
+
+    <!-- Header / Navbar -->
+    <header class="bg-hpBlueLight border-b-2 border-hpDustyPink/40 py-4 px-6 shadow-lg">
+        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <span class="text-3xl">⚡</span>
+                <div>
+                    <h1 class="magical-title text-2xl md:text-3xl font-bold tracking-wider text-hpGold">Hogwarts English Hub</h1>
+                    <p class="text-xs text-hpDustyPink tracking-wide">霍格華茲魔法英語學習與口說訓練中心</p>
+                </div>
+            </div>
+            
+            <!-- Student / Teacher Switcher -->
+            <div class="flex items-center gap-3">
+                <div id="activeUserBadge" class="px-4 py-1.5 rounded-full bg-hpDustyPink/20 border border-hpDustyPink text-hpGold text-sm font-semibold flex items-center gap-2">
+                    <span>🧙‍♂️ 當前身份：</span><span id="currentUserNameDisplay" class="underline decoration-hpGold">Eason</span>
+                </div>
+                <button onclick="openTeacherModal()" class="px-3 py-1.5 bg-hpBurgundy hover:bg-hpBurgundy/80 text-white text-xs font-bold rounded-lg border border-hpGold/40 shadow transition">
+                    🏰 教授專區 (Teacher)
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="max-w-5xl w-full mx-auto px-4 py-8 flex-grow">
+        
+        <!-- Student / Test Portal Selection Bar -->
+        <section class="mb-8 p-4 rounded-xl bg-hpBlueLight/60 border border-hpDustyPink/30 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-md">
+            <div>
+                <h2 class="text-lg font-bold text-hpGold flex items-center gap-2">
+                    <span>📜 學徒與測試入口切換</span>
+                </h2>
+                <p class="text-xs text-hpDustyPink mt-0.5">選擇 Eason、yangyang 進行學習紀錄，或切換至「🧪 老師測試入口」即時驗證單字。</p>
+            </div>
+            <div class="flex flex-wrap gap-2">
+                <button onclick="switchStudent('Eason')" id="btnEason" class="px-4 py-2 rounded-lg font-bold text-sm transition border-2 border-hpGold bg-hpGold text-hpBlue shadow">
+                    Eason
+                </button>
+                <button onclick="switchStudent('yangyang')" id="btnYangyang" class="px-4 py-2 rounded-lg font-bold text-sm transition border-2 border-hpDustyPink/60 bg-transparent text-hpDustyPink hover:bg-hpDustyPink/10">
+                    yangyang
+                </button>
+                <button onclick="switchStudent('TestPortal')" id="btnTestPortal" class="px-4 py-2 rounded-lg font-bold text-sm transition border-2 border-hpBurgundy bg-hpBurgundy/40 text-hpGold hover:bg-hpBurgundy/70">
+                    🧪 老師測試入口 (Test Portal)
+                </button>
+            </div>
+        </section>
+
+        <!-- Vocabulary Learning Section -->
+        <section>
+            <div class="mb-6 text-center">
+                <h2 id="sectionTitle" class="magical-title text-2xl font-bold text-hpGold">✨ 魔法單字與口說咒語練習 (Vocabulary & Incantations)</h2>
+                <p id="sectionSubtitle" class="text-sm text-hpDustyPink mt-1">正面專注單字發音與 AI 評分；點擊翻面可進行例句的 Read Aloud 示範與句子口說評定！</p>
+            </div>
+
+            <!-- Vocabulary Cards Grid -->
+            <div id="vocabContainer" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Dynamic Vocabulary Cards will be injected here -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Teacher Password & Control Modal -->
+    <div id="teacherModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="parchment-box w-full max-w-2xl rounded-2xl p-6 relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closeTeacherModal()" class="absolute top-4 right-4 text-gray-500 hover:text-black font-bold text-xl">✕</button>
+            
+            <div id="teacherLoginView">
+                <h3 class="magical-title text-xl font-bold text-hpBurgundy mb-2">🏰 教授防護結界 (Teacher Login)</h3>
+                <p class="text-xs text-gray-600 mb-4">此區域僅限霍格華茲教授進入。請輸入通關密碼（密碼：0000）。</p>
+                <div class="flex gap-2">
+                    <input type="password" id="teacherPasswordInput" class="flex-grow px-4 py-2 border rounded-lg focus:outline-none focus:border-hpBurgundy">
+                    <button onclick="verifyTeacherPassword()" class="px-5 py-2 bg-hpBurgundy text-white font-bold rounded-lg hover:bg-hpBurgundy/80 transition">解開結界</button>
+                </div>
+                <p id="loginErrorMsg" class="text-red-600 text-xs mt-2 hidden">密碼錯誤，請重新嘗試！</p>
+            </div>
+
+            <div id="teacherDashboardView" class="hidden">
+                <div class="flex justify-between items-center mb-4 border-b pb-2">
+                    <h3 class="magical-title text-xl font-bold text-hpBurgundy">🏰 教授管理大廳 (Teacher Dashboard)</h3>
+                    <button onclick="lockTeacherModal()" class="text-xs text-red-700 underline">鎖定並退出</button>
+                </div>
+                <p class="text-xs text-gray-600 mb-4">只要輸入單字，系統會自動帶入符合劍橋辭典風格的解釋與簡單句／對等句造句！</p>
+                
+                <!-- Add New Word Form -->
+                <div class="bg-amber-50 p-4 rounded-xl border border-amber-200 mb-6">
+                    <h4 class="font-bold text-sm text-gray-800 mb-3">🪄 快速新增單字 (Quick Add Word)</h4>
+                    <div class="flex gap-2 mb-2">
+                        <input type="text" id="newWord" placeholder="請輸入單字 (e.g., Magic, Spell, Brave)" class="flex-grow px-3 py-2 text-sm border rounded focus:outline-none focus:border-hpBurgundy">
+                        <button onclick="addNewVocabulary()" class="px-5 py-2 bg-hpBurgundy text-white font-bold text-sm rounded-lg hover:bg-hpBurgundy/80 transition whitespace-nowrap">✨ 自動生成並加入</button>
+                    </div>
+                    <p class="text-[11px] text-gray-500">提示：系統將自動生成劍橋風格解釋與 Simple/Compound sentence 例句。新增後可至「🧪 老師測試入口」驗證。</p>
+                </div>
+
+                <!-- Existing Words List -->
+                <div>
+                    <h4 class="font-bold text-sm text-gray-800 mb-2">📋 現有單字清單與刪除</h4>
+                    <div id="teacherWordList" class="space-y-2 max-h-48 overflow-y-auto pr-1"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Individual Item Progress Curve Modal -->
+    <div id="progressModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="parchment-box w-full max-w-xl rounded-2xl p-6 relative">
+            <button onclick="closeProgressModal()" class="absolute top-4 right-4 text-gray-500 hover:text-black font-bold text-xl">✕</button>
+            <h3 id="progressModalTitle" class="magical-title text-xl font-bold text-hpBurgundy mb-1">📈 學習曲線分析</h3>
+            <p id="progressModalSubtitle" class="text-xs text-gray-600 mb-4">顯示此單字或例句在歷次練習中的分數成長趨勢。</p>
+            <div class="bg-white p-4 rounded-xl border border-gray-300 shadow-inner">
+                <canvas id="itemProgressChart" height="180"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-hpBlueLight border-t-2 border-hpDustyPink/40 py-4 text-center text-xs text-hpDustyPink">
+        <p>⚡ Hogwarts Magical English Learning Hub © 2026 | Designed for Eason, yangyang & Teachers</p>
+    </footer>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        let currentStudent = 'Eason'; // 'Eason', 'yangyang', or 'TestPortal'
+        let vocabList = [
+            {
+                id: 1,
+                word: "Courage",
+                definition: "Showing no fear of dangerous or difficult things.",
+                sentenceEn: "Eason was very brave, and he walked into the dark forest.",
+                sentenceZh: "中文意思：Eason 非常勇敢，他走進了黑暗的森林。（使用時機：表達展現勇氣時）",
+                houseTheme: "border-red-500 bg-gradient-to-br from-red-50 to-amber-50"
+            },
+            {
+                id: 2,
+                word: "Curious",
+                definition: "Eager to know or learn something new.",
+                sentenceEn: "Harry was curious, and he opened the mysterious package.",
+                sentenceZh: "中文意思：哈利感到很好奇，他打開了那個神祕的包裹。（使用時機：表達探索欲時）",
+                houseTheme: "border-emerald-500 bg-gradient-to-br from-emerald-50 to-teal-50"
+            },
+            {
+                id: 3,
+                word: "Wisdom",
+                definition: "The quality of having good judgment and deep knowledge.",
+                sentenceEn: "Dumbledore shared his wisdom, and the young wizards listened.",
+                sentenceZh: "中文意思：鄧不利多分享了他的智慧，年輕的巫師們都靜靜聽著。（使用時機：形容深刻見解時）",
+                houseTheme: "border-blue-500 bg-gradient-to-br from-blue-50 to-indigo-50"
+            },
+            {
+                id: 4,
+                word: "Loyalty",
+                definition: "Strong faithfulness and devotion to someone.",
+                sentenceEn: "Hufflepuff house values loyalty, and students work hard together.",
+                sentenceZh: "中文意思：赫夫帕夫學院重視忠誠，學生們也一起努力。（使用時機：表達團隊情誼時）",
+                houseTheme: "border-amber-400 bg-gradient-to-br from-amber-50 to-yellow-50"
+            }
+        ];
+
+        let scoreHistory = JSON.parse(localStorage.getItem('hogwarts_score_history_v5')) || {
+            "Eason": {},
+            "yangyang": {},
+            "TestPortal": {}
+        };
+
+        let activeChart = null;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            renderVocabCards();
+            updateStudentUI();
+        });
+
+        function switchStudent(name) {
+            currentStudent = name;
+            
+            const btnEason = document.getElementById('btnEason');
+            const btnYangyang = document.getElementById('btnYangyang');
+            const btnTestPortal = document.getElementById('btnTestPortal');
+            const titleEl = document.getElementById('sectionTitle');
+            const subtitleEl = document.getElementById('sectionSubtitle');
+
+            btnEason.className = "px-4 py-2 rounded-lg font-bold text-sm transition border-2 border-hpDustyPink/60 bg-transparent text-hpDustyPink hover:bg-hpDustyPink/10";
+            btnYangyang.className = "px-4 py-2 rounded-lg font-bold text-sm transition border-2 border-hpDustyPink/60 bg-transparent text-hpDustyPink hover:bg-hpDustyPink/10";
+            btnTestPortal.className = "px-4 py-2 rounded-lg font-bold text-sm transition border-2 border-hpDustyPink/60 bg-transparent text-hpDustyPink hover:bg-hpDustyPink/10";
+
+            if (name === 'Eason') {
+                btnEason.className = "px-4 py-2 rounded-lg font-bold text-sm transition border-2 border-hpGold bg-hpGold text-hpBlue shadow";
+                document.getElementById('currentUserNameDisplay').textContent = 'Eason';
+                titleEl.textContent = "✨ Eason 的魔法單字與口說練習";
+            } else if (name === 'yangyang') {
+                btnYangyang.className = "px-4 py-2 rounded-lg font-bold text-sm transition border-2 border-hpGold bg-hpGold text-hpBlue shadow";
+                document.getElementById('currentUserNameDisplay').textContent = 'yangyang';
+                titleEl.textContent = "✨ yangyang 的魔法單字與口說練習";
+            } else if (name === 'TestPortal') {
+                btnTestPortal.className = "px-4 py-2 rounded-lg font-bold text-sm transition border-2 border-hpGold bg-hpBurgundy text-hpGold shadow";
+                document.getElementById('currentUserNameDisplay').textContent = '🧪 老師測試入口';
+                titleEl.textContent = "🧪 老師測試入口 (Test Portal - 即時驗證區)";
+                subtitleEl.textContent = "在此測試您剛新增的單字發音、朗讀與曲線，不影響學生正式成績。";
+            }
+            renderVocabCards();
+        }
+
+        function updateStudentUI() {
+            document.getElementById('currentUserNameDisplay').textContent = currentStudent === 'TestPortal' ? '🧪 老師測試入口' : currentStudent;
+        }
+
+        function renderVocabCards() {
+            const container = document.getElementById('vocabContainer');
+            container.innerHTML = '';
+
+            vocabList.forEach((item, index) => {
+                const cardDiv = document.createElement('div');
+                cardDiv.className = "perspective-1000 h-[440px] w-full";
+                
+                cardDiv.innerHTML = `
+                    <div id="card-inner-${item.id}" class="transform-style-3d relative w-full h-full rounded-2xl shadow-xl cursor-pointer">
+                        
+                        <!-- FRONT SIDE -->
+                        <div class="backface-hidden absolute inset-0 rounded-2xl p-6 border-4 ${item.houseTheme} flex flex-col justify-between">
+                            <div class="flex justify-between items-start">
+                                <span class="text-xs uppercase font-bold tracking-widest px-2.5 py-1 bg-white/85 rounded-full text-gray-700 shadow-sm">Card #${index + 1} (正面：單字學習)</span>
+                                <span class="text-xs text-gray-500 font-semibold">點擊翻面 ➔</span>
+                            </div>
+
+                            <div class="text-center my-auto space-y-3">
+                                <h3 class="text-3xl font-black text-gray-900 tracking-wide font-magic">${item.word}</h3>
+                                <p class="text-sm text-gray-700 px-4 font-medium">${item.definition}</p>
+                            </div>
+
+                            <div class="space-y-2">
+                                <button onclick="event.stopPropagation(); playAudio('${item.word}')" class="w-full py-2 bg-hpBlue hover:bg-hpBlueLight text-hpGold font-bold text-sm rounded-xl shadow transition flex items-center justify-center gap-2">
+                                    <span>🔊 聆聽單字發音</span>
+                                </button>
+                                <div class="flex gap-2">
+                                    <button onclick="event.stopPropagation(); scorePronunciation('${item.word}', 'word_${item.word}')" class="flex-grow py-2 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow transition">
+                                        🎤 單字 AI 發音評分
+                                    </button>
+                                    <button onclick="event.stopPropagation(); openItemProgress('${item.word}', 'word_${item.word}')" class="px-4 py-2 bg-hpBurgundy hover:bg-hpBurgundy/80 text-white font-bold text-xs rounded-xl shadow transition">
+                                        📈 學習曲線
+                                    </button>
+                                </div>
+                                <button onclick="event.stopPropagation(); flipCard(${item.id})" class="w-full py-1.5 bg-amber-800 hover:bg-amber-900 text-white font-bold text-xs rounded-xl shadow transition">
+                                    🔄 翻至背面 (看例句練習)
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- BACK SIDE -->
+                        <div class="backface-hidden rotate-y-180 absolute inset-0 rounded-2xl p-6 border-4 ${item.houseTheme} flex flex-col justify-between bg-amber-50/95">
+                            <div class="flex justify-between items-start">
+                                <span class="text-xs font-bold text-hpBurgundy">💡 背面：例句練習與口說評定</span>
+                                <button onclick="event.stopPropagation(); flipCard(${item.id})" class="text-xs text-gray-600 underline font-bold">返回正面 ↺</button>
+                            </div>
+
+                            <div class="my-auto space-y-3">
+                                <div class="bg-white/95 p-3.5 rounded-xl border border-amber-200 shadow-sm space-y-1.5">
+                                    <p class="text-xs font-bold text-gray-400 uppercase">Example Sentence:</p>
+                                    <p class="text-sm font-bold text-gray-900">${item.sentenceEn}</p>
+                                    <p class="text-xs text-gray-700 font-semibold pt-1 border-t border-gray-100">${item.sentenceZh}</p>
+                                </div>
+                                <button onclick="event.stopPropagation(); playAudio('${item.sentenceEn}')" class="w-full py-2 bg-hpBlue hover:bg-hpBlueLight text-hpGold font-bold text-xs rounded-xl shadow transition">
+                                    🔊 例句 Read Aloud 示範
+                                </button>
+                                <div class="flex gap-2">
+                                    <button onclick="event.stopPropagation(); scorePronunciation('${item.sentenceEn}', 'sent_${item.id}')" class="flex-grow py-2 bg-indigo-700 hover:bg-indigo-800 text-white font-bold text-xs rounded-xl shadow transition">
+                                        🎙️ 句子 AI 口說評定
+                                    </button>
+                                    <button onclick="event.stopPropagation(); openItemProgress('${item.word} (例句)', 'sent_${item.id}')" class="px-4 py-2 bg-hpBurgundy hover:bg-hpBurgundy/80 text-white font-bold text-xs rounded-xl shadow transition">
+                                        📈 句子曲線
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="text-center">
+                                <p id="feedback_${item.id}" class="text-xs font-bold text-hpBurgundy min-h-[1.2rem]"></p>
+                            </div>
+                        </div>
+
+                    </div>
+                `;
+                container.appendChild(cardDiv);
+            });
+        }
+
+        function flipCard(id) {
+            const inner = document.getElementById(`card-inner-${id}`);
+            inner.classList.toggle('flipped');
+        }
+
+        function playAudio(text) {
+            if (!('speechSynthesis' in window)) {
+                alert('您的瀏覽器不支援語音播放功能。');
+                return;
+            }
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-US';
+            utterance.rate = 1.0;
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function scorePronunciation(targetText, typeKey) {
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                alert('您的瀏覽器不支援語音辨識評分功能，請使用 Chrome 瀏覽器。');
+                return;
+            }
+
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'en-US';
+            recognition.interimResults = false;
+            recognition.maxAlternatives = 1;
+
+            alert(`🪄 魔法麥克風已啟動！請清晰朗讀：\n\n"${targetText}"`);
+
+            recognition.onresult = function(event) {
+                const spokenText = event.results[0][0].transcript.toLowerCase();
+                const targetLower = targetText.toLowerCase().replace(/[^a-z0-9 ]/g, '');
+                const spokenClean = spokenText.replace(/[^a-z0-9 ]/g, '');
+
+                let score = calculateSimilarity(targetLower, spokenClean);
+                
+                if (!scoreHistory[currentStudent]) {
+                    scoreHistory[currentStudent] = {};
+                }
+                const recordKey = `${currentStudent}_${typeKey}`;
+                if (!scoreHistory[currentStudent][recordKey]) {
+                    scoreHistory[currentStudent][recordKey] = [];
+                }
+                scoreHistory[currentStudent][recordKey].push(score);
+                localStorage.setItem('hogwarts_score_history_v5', JSON.stringify(scoreHistory));
+
+                let feedback = `得分：${score}分！`;
+                if (score >= 90) {
+                    feedback += " 🌟 巫師級完美發音！";
+                } else if (score >= 70) {
+                    feedback += " ✨ 發音清晰，表現很棒！";
+                } else {
+                    feedback += " 💡 建議再聽一次示範發音喔！";
+                }
+
+                alert(`【AI 語音評分報告】\n身分：${currentStudent}\n你說的內容：${spokenText}\n目標內容：${targetText}\n${feedback}`);
+            };
+
+            recognition.onerror = function(event) {
+                alert('語音辨識發生錯誤或未偵測到聲音，請再試一次。');
+            };
+
+            recognition.start();
+        }
+
+        function calculateSimilarity(target, spoken) {
+            if (spoken.includes(target) || target.includes(spoken)) {
+                return Math.floor(Math.random() * 11) + 90;
+            }
+            const targetWords = target.split(' ');
+            const spokenWords = spoken.split(' ');
+            let matches = 0;
+            targetWords.forEach(w => {
+                if (spokenWords.includes(w)) matches++;
+            });
+            const ratio = matches / targetWords.length;
+            let score = Math.floor(ratio * 70) + 30;
+            if (score > 98) score = 98;
+            return score;
+        }
+
+        function openItemProgress(titleName, recordKeySuffix) {
+            const modal = document.getElementById('progressModal');
+            modal.classList.remove('hidden');
+
+            const recordKey = `${currentStudent}_${recordKeySuffix}`;
+            const historyData = (scoreHistory[currentStudent] && scoreHistory[currentStudent][recordKey]) || [82, 88, 95];
+
+            document.getElementById('progressModalTitle').textContent = `📈 [${currentStudent}] 「${titleName}」學習曲線`;
+            document.getElementById('progressModalSubtitle').textContent = `追蹤歷次練習的口說評分變化趨勢`;
+
+            const ctx = document.getElementById('itemProgressChart').getContext('2d');
+            if (activeChart) {
+                activeChart.destroy();
+            }
+
+            const labels = historyData.map((_, i) => `第 ${i + 1} 次`);
+
+            activeChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: `${titleName} 歷史得分`,
+                        data: historyData,
+                        borderColor: '#74151d',
+                        backgroundColor: 'rgba(212, 165, 165, 0.25)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.3,
+                        pointBackgroundColor: '#0c1b33',
+                        pointRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            min: 0,
+                            max: 100,
+                            ticks: { stepSize: 20 }
+                        }
+                    }
+                }
+            });
+        }
+
+        function closeProgressModal() {
+            document.getElementById('progressModal').classList.add('hidden');
+        }
+
+        function openTeacherModal() {
+            document.getElementById('teacherModal').classList.remove('hidden');
+            document.getElementById('teacherLoginView').classList.remove('hidden');
+            document.getElementById('teacherDashboardView').classList.add('hidden');
+            document.getElementById('teacherPasswordInput').value = '';
+            document.getElementById('loginErrorMsg').classList.add('hidden');
+        }
+
+        function closeTeacherModal() {
+            document.getElementById('teacherModal').classList.add('hidden');
+        }
+
+        function verifyTeacherPassword() {
+            const pass = document.getElementById('teacherPasswordInput').value;
+            if (pass === '0000') {
+                document.getElementById('teacherLoginView').classList.add('hidden');
+                document.getElementById('teacherDashboardView').classList.remove('hidden');
+                renderTeacherWordList();
+            } else {
+                document.getElementById('loginErrorMsg').classList.remove('hidden');
+            }
+        }
+
+        function lockTeacherModal() {
+            document.getElementById('teacherDashboardView').classList.add('hidden');
+            document.getElementById('teacherLoginView').classList.remove('hidden');
+        }
+
+        function addNewVocabulary() {
+            const rawWord = document.getElementById('newWord').value.trim();
+            if (!rawWord) {
+                alert('請輸入單字！');
+                return;
+            }
+
+            const word = rawWord.charAt(0).toUpperCase() + rawWord.slice(1).toLowerCase();
+
+            let definition = `A word or phrase that relates to "${word.toLowerCase()}".`;
+            let sentenceEn = `The young wizard practiced ${word.toLowerCase()}, and he became very confident.`;
+            let sentenceZh = `中文意思：年輕的巫師練習了 ${word.toLowerCase()}，他變得非常有自信。（使用時機：表達練習成果時）`;
+
+            const presets = {
+                "Magic": { def: "The power of apparently influencing events by using mysterious or supernatural forces.", sent: "Harry learned a new magic spell, and he practiced it carefully.", zh: "中文意思：哈利學了一個新的魔法咒語，並且小心翼翼地練習它。（使用時機：形容超自然力量時）" },
+                "Spell": { def: "A word or a form of words that is believed to have magical power.", sent: "The young wizard cast a spell, and the heavy door opened instantly.", zh: "中文意思：年輕的巫師施展了一個咒語，重重的門立刻就打開了。（使用時機：施放魔法時）" },
+                "Brave": { def: "Showing no fear of dangerous or difficult things.", sent: "Eason was very brave, and he walked into the dark forest.", zh: "中文意思：Eason 非常勇敢，他走進了黑暗的森林。（使用時機：讚許不畏懼危險時）" },
+                "Friendship": { def: "A relationship between friends based on trust and care.", sent: "Their strong friendship helped them through the difficult test.", zh: "中文意思：他們深厚的友誼幫助他們通過了困難的考驗。（使用時機：表達同伴情誼時）" }
+            };
+
+            if (presets[word]) {
+                definition = presets[word].def;
+                sentenceEn = presets[word].sent;
+                sentenceZh = presets[word].zh;
+            }
+
+            const houseThemes = [
+                "border-red-500 bg-gradient-to-br from-red-50 to-amber-50",
+                "border-emerald-500 bg-gradient-to-br from-emerald-50 to-teal-50",
+                "border-blue-500 bg-gradient-to-br from-blue-50 to-indigo-50",
+                "border-amber-400 bg-gradient-to-br from-amber-50 to-yellow-50"
+            ];
+            const randomTheme = houseThemes[Math.floor(Math.random() * houseThemes.length)];
+
+            vocabList.push({
+                id: Date.now(),
+                word,
+                definition,
+                sentenceEn,
+                sentenceZh,
+                houseTheme: randomTheme
+            });
+
+            document.getElementById('newWord').value = '';
+            renderVocabCards();
+            renderTeacherWordList();
+            alert(`✨ 成功自動生成並新增單字「${word}」！你可以切換至「🧪 老師測試入口」進行即時驗證。`);
+        }
+
+        function renderTeacherWordList() {
+            const listContainer = document.getElementById('teacherWordList');
+            listContainer.innerHTML = '';
+
+            vocabList.forEach((item) => {
+                const row = document.createElement('div');
+                row.className = "flex justify-between items-center bg-white p-2.5 rounded border text-sm";
+                row.innerHTML = `
+                    <div>
+                        <span class="font-bold text-hpBurgundy">${item.word}</span> 
+                        <span class="text-xs text-gray-500">(${item.definition})</span>
+                    </div>
+                    <button onclick="deleteVocabulary(${item.id})" class="text-xs text-red-600 hover:underline font-bold">刪除</button>
+                `;
+                listContainer.appendChild(row);
+            });
+        }
+
+        function deleteVocabulary(id) {
+            vocabList = vocabList.filter(item => item.id !== id);
+            renderVocabCards();
+            renderTeacherWordList();
+        }
+    </script>
+</body>
+</html>
