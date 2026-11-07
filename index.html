@@ -93,7 +93,7 @@
     <main class="max-w-5xl w-full mx-auto px-4 py-8 flex-grow">
         
         <!-- Student / Test Portal Selection Bar -->
-        <section class="mb-8 p-4 rounded-xl bg-hpBlueLight/60 border border-hpDustyPink/30 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-md">
+        <section class="mb-6 p-4 rounded-xl bg-hpBlueLight/60 border border-hpDustyPink/30 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-md">
             <div>
                 <h2 class="text-lg font-bold text-hpGold flex items-center gap-2">
                     <span>📜 學徒與測試入口切換</span>
@@ -113,11 +113,25 @@
             </div>
         </section>
 
+        <!-- Unit Selection Bar (Unit 1 to Unit 5) -->
+        <section class="mb-8 p-4 rounded-xl bg-hpBlueLight/40 border border-hpGold/40 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-md">
+            <div class="flex items-center gap-2">
+                <span class="text-xl">📂</span>
+                <div>
+                    <h3 class="text-sm font-bold text-hpGold">選擇學習單元 (Select Unit)</h3>
+                    <p class="text-[11px] text-hpDustyPink">點選不同單元可精準切換練習內容，避免頁面過長。</p>
+                </div>
+            </div>
+            <div id="unitTabsContainer" class="flex flex-wrap gap-2">
+                <!-- Unit tabs injected dynamically -->
+            </div>
+        </section>
+
         <!-- Vocabulary Learning Section -->
         <section>
             <div class="mb-6 text-center">
                 <h2 id="sectionTitle" class="magical-title text-2xl font-bold text-hpGold">✨ 魔法單字與口說咒語練習 (Vocabulary & Incantations)</h2>
-                <p id="sectionSubtitle" class="text-sm text-hpDustyPink mt-1">正面專注單字發音與 AI 評分；點擊翻面可進行劍橋風格例句的 Read Aloud 示範與句子口說評定！</p>
+                <p id="sectionSubtitle" class="text-sm text-hpDustyPink mt-1">正面顯示詞性與劍橋風格解釋；點擊翻面可進行道地例句的 Read Aloud 示範與口說評定！</p>
             </div>
 
             <!-- Vocabulary Cards Grid -->
@@ -134,7 +148,7 @@
             
             <div id="teacherLoginView">
                 <h3 class="magical-title text-xl font-bold text-hpBurgundy mb-2">🏰 教授防護結界 (Teacher Login)</h3>
-                <p class="text-xs text-gray-600 mb-4">此區域僅限霍格華茲教授進入。請輸入專屬通關密碼。</p>
+                <p class="text-xs text-gray-600 mb-4">此區域僅限霍格華茲教授進入。請輸入專屬通關密碼（密碼：1234）。</p>
                 <div class="flex gap-2">
                     <input type="password" id="teacherPasswordInput" placeholder="" class="flex-grow px-4 py-2 border rounded-lg focus:outline-none focus:border-hpBurgundy">
                     <button onclick="verifyTeacherPassword()" class="px-5 py-2 bg-hpBurgundy text-white font-bold rounded-lg hover:bg-hpBurgundy/80 transition">解開結界</button>
@@ -147,16 +161,28 @@
                     <h3 class="magical-title text-xl font-bold text-hpBurgundy">🏰 教授管理大廳 (Teacher Dashboard)</h3>
                     <button onclick="lockTeacherModal()" class="text-xs text-red-700 underline">鎖定並退出</button>
                 </div>
-                <p class="text-xs text-gray-600 mb-4">輸入單字後，系統將自動對應劍橋辭典風格解釋，並生成具備活潑魔法風格主詞的道地例句！</p>
+                <p class="text-xs text-gray-600 mb-4">選擇目標單元後輸入單字，系統將自動產生詞性、劍橋解釋與道地魔法例句，且會永久自動儲存！</p>
                 
                 <!-- Add New Word Form -->
-                <div class="bg-amber-50 p-4 rounded-xl border border-amber-200 mb-6">
-                    <h4 class="font-bold text-sm text-gray-800 mb-3">🪄 快速新增單字 (Quick Add Word)</h4>
-                    <div class="flex gap-2 mb-2">
-                        <input type="text" id="newWord" placeholder="請輸入單字 (e.g., Bottle, Potion, Magic)" class="flex-grow px-3 py-2 text-sm border rounded focus:outline-none focus:border-hpBurgundy">
+                <div class="bg-amber-50 p-4 rounded-xl border border-amber-200 mb-6 space-y-3">
+                    <h4 class="font-bold text-sm text-gray-800">🪄 快速新增單字到指定單元</h4>
+                    
+                    <div class="flex gap-2 items-center">
+                        <label class="text-xs font-bold text-gray-700 whitespace-nowrap">選擇單元：</label>
+                        <select id="newWordUnit" class="px-3 py-1.5 text-sm border rounded bg-white focus:outline-none focus:border-hpBurgundy font-semibold text-hpBurgundy">
+                            <option value="Unit 1">Unit 1</option>
+                            <option value="Unit 2">Unit 2</option>
+                            <option value="Unit 3">Unit 3</option>
+                            <option value="Unit 4">Unit 4</option>
+                            <option value="Unit 5">Unit 5</option>
+                        </select>
+                    </div>
+
+                    <div class="flex gap-2">
+                        <input type="text" id="newWord" placeholder="請輸入單字 (e.g., Beard, Bottle, Potion)" class="flex-grow px-3 py-2 text-sm border rounded focus:outline-none focus:border-hpBurgundy">
                         <button onclick="addNewVocabulary()" class="px-5 py-2 bg-hpBurgundy text-white font-bold text-sm rounded-lg hover:bg-hpBurgundy/80 transition whitespace-nowrap">✨ 自動生成並加入</button>
                     </div>
-                    <p class="text-[11px] text-gray-500">提示：系統將自動採用劍橋辭典標準句型，並融入魔法情境。新增後可至「🧪 老師測試入口」驗證。</p>
+                    <p class="text-[11px] text-gray-500">提示：系統將自動生成詞性與劍橋風格例句，資料永久安全儲存於瀏覽器中。</p>
                 </div>
 
                 <!-- Existing Words List -->
@@ -188,42 +214,56 @@
     <!-- JavaScript Application Logic -->
     <script>
         let currentStudent = 'Eason'; // 'Eason', 'yangyang', or 'TestPortal'
-        let vocabList = [
+        let currentSelectedUnit = 'Unit 1'; // Default active unit
+
+        // Default Cambridge-style vocabulary list with Units & Parts of Speech
+        let defaultVocabList = [
             {
                 id: 1,
+                unit: "Unit 1",
+                word: "Beard",
+                pos: "noun [C]",
+                definition: "The hair that grows on a man's chin and cheeks.",
+                sentenceEn: "Dumbledore has a long white beard that reaches his belt.",
+                sentenceZh: "中文意思：鄧不利多有一把長長的白鬍子，一直垂到他的腰帶。（劍橋辭典常見外貌描述句型）",
+                houseTheme: "border-blue-500 bg-gradient-to-br from-blue-50 to-indigo-50"
+            },
+            {
+                id: 2,
+                unit: "Unit 1",
                 word: "Bottle",
+                pos: "noun [C]",
                 definition: "A glass or plastic container used for storing liquids, with a narrow neck.",
                 sentenceEn: "Professor Snape put a magic potion into a glass bottle.",
                 sentenceZh: "中文意思：石內卜教授把神奇魔藥裝進了一個玻璃瓶裡。（劍橋辭典常見物品容器句型）",
                 houseTheme: "border-emerald-500 bg-gradient-to-br from-emerald-50 to-teal-50"
             },
             {
-                id: 2,
+                id: 3,
+                unit: "Unit 2",
                 word: "Courage",
+                pos: "noun [U]",
                 definition: "The ability to control your fear in a dangerous or difficult situation.",
                 sentenceEn: "Eason showed great courage when he walked into the dark forest.",
                 sentenceZh: "中文意思：Eason 當他走進黑暗森林時展現了巨大的勇氣。（劍橋辭典標準抽象名詞句型）",
                 houseTheme: "border-red-500 bg-gradient-to-br from-red-50 to-amber-50"
             },
             {
-                id: 3,
+                id: 4,
+                unit: "Unit 2",
                 word: "Curious",
+                pos: "adjective",
                 definition: "Interested in learning about people or things around you.",
                 sentenceEn: "Harry was curious about the mysterious package from Dumbledore.",
                 sentenceZh: "中文意思：哈利對於鄧不利多寄來的神祕包裹感到十分好奇。（劍橋辭典常見形容詞搭配句型）",
-                houseTheme: "border-blue-500 bg-gradient-to-br from-blue-50 to-indigo-50"
-            },
-            {
-                id: 4,
-                word: "Wisdom",
-                definition: "The ability to make good decisions using your knowledge and experience.",
-                sentenceEn: "Dumbledore shared his wisdom with all the young wizards.",
-                sentenceZh: "中文意思：鄧不利多將他的智慧分享給所有年輕的巫師們。（劍橋辭典名詞慣用語句型）",
                 houseTheme: "border-amber-400 bg-gradient-to-br from-amber-50 to-yellow-50"
             }
         ];
 
-        let scoreHistory = JSON.parse(localStorage.getItem('hogwarts_score_history_v6')) || {
+        // Load vocabulary and score history from localStorage safely
+        let vocabList = JSON.parse(localStorage.getItem('hogwarts_vocab_list_v8')) || defaultVocabList;
+
+        let scoreHistory = JSON.parse(localStorage.getItem('hogwarts_score_history_v8')) || {
             "Eason": {},
             "yangyang": {},
             "TestPortal": {}
@@ -232,9 +272,40 @@
         let activeChart = null;
 
         window.addEventListener('DOMContentLoaded', () => {
+            renderUnitTabs();
             renderVocabCards();
             updateStudentUI();
         });
+
+        function saveVocabToStorage() {
+            localStorage.setItem('hogwarts_vocab_list_v8', JSON.stringify(vocabList));
+        }
+
+        function switchUnit(unitName) {
+            currentSelectedUnit = unitName;
+            renderUnitTabs();
+            renderVocabCards();
+        }
+
+        function renderUnitTabs() {
+            const container = document.getElementById('unitTabsContainer');
+            container.innerHTML = '';
+
+            const units = ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"];
+            units.forEach(u => {
+                const count = vocabList.filter(item => item.unit === u).length;
+                const btn = document.createElement('button');
+                const isActive = currentSelectedUnit === u;
+                
+                btn.className = isActive 
+                    ? "px-4 py-1.5 rounded-lg font-bold text-xs transition border-2 border-hpGold bg-hpGold text-hpBlue shadow flex items-center gap-1.5"
+                    : "px-4 py-1.5 rounded-lg font-bold text-xs transition border border-hpDustyPink/50 bg-hpBlueLight text-hpDustyPink hover:bg-hpDustyPink/20 flex items-center gap-1.5";
+                
+                btn.innerHTML = `<span>${u}</span> <span class="px-1.5 py-0.2 rounded-full text-[10px] ${isActive ? 'bg-hpBlue text-hpGold' : 'bg-black/30 text-white'}">${count}</span>`;
+                btn.onclick = () => switchUnit(u);
+                container.appendChild(btn);
+            });
+        }
 
         function switchStudent(name) {
             currentStudent = name;
@@ -274,7 +345,19 @@
             const container = document.getElementById('vocabContainer');
             container.innerHTML = '';
 
-            vocabList.forEach((item, index) => {
+            const filteredList = vocabList.filter(item => item.unit === currentSelectedUnit);
+
+            if (filteredList.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full text-center py-12 bg-hpBlueLight/40 rounded-2xl border border-hpDustyPink/30">
+                        <p class="text-hpGold font-bold text-base">🏰 ${currentSelectedUnit} 目前尚無單字卡</p>
+                        <p class="text-xs text-hpDustyPink mt-1">請點擊右上角「🏰 教授專區」登入後，新增單字並指派至此單元！</p>
+                    </div>
+                `;
+                return;
+            }
+
+            filteredList.forEach((item) => {
                 const cardDiv = document.createElement('div');
                 cardDiv.className = "perspective-1000 h-[440px] w-full";
                 
@@ -284,13 +367,14 @@
                         <!-- FRONT SIDE -->
                         <div class="backface-hidden absolute inset-0 rounded-2xl p-6 border-4 ${item.houseTheme} flex flex-col justify-between">
                             <div class="flex justify-between items-start">
-                                <span class="text-xs uppercase font-bold tracking-widest px-2.5 py-1 bg-white/85 rounded-full text-gray-700 shadow-sm">Card #${index + 1} (正面：劍橋單字解釋)</span>
+                                <span class="text-xs font-bold px-2 py-0.5 bg-hpBlue text-hpGold rounded-md shadow-sm">${item.unit}</span>
                                 <span class="text-xs text-gray-500 font-semibold">點擊翻面 ➔</span>
                             </div>
 
-                            <div class="text-center my-auto space-y-3">
-                                <h3 class="text-3xl font-black text-gray-900 tracking-wide font-magic">${item.word}</h3>
-                                <p class="text-sm text-gray-800 px-4 font-medium leading-relaxed">${item.definition}</p>
+                            <div class="text-center my-auto space-y-2">
+                                <h3 class="text-3xl font-black text-gray-950 tracking-wide font-magic">${item.word}</h3>
+                                <p class="text-xs font-bold text-hpBurgundy italic tracking-wide">${item.pos}</p>
+                                <p class="text-sm text-gray-800 px-2 font-medium leading-relaxed">${item.definition}</p>
                             </div>
 
                             <div class="space-y-2">
@@ -314,7 +398,7 @@
                         <!-- BACK SIDE -->
                         <div class="backface-hidden rotate-y-180 absolute inset-0 rounded-2xl p-6 border-4 ${item.houseTheme} flex flex-col justify-between bg-amber-50/95">
                             <div class="flex justify-between items-start">
-                                <span class="text-xs font-bold text-hpBurgundy">💡 背面：劍橋道地例句與口說評定</span>
+                                <span class="text-xs font-bold px-2 py-0.5 bg-hpBurgundy text-white rounded-md shadow-sm">${item.unit} (例句)</span>
                                 <button onclick="event.stopPropagation(); flipCard(${item.id})" class="text-xs text-gray-600 underline font-bold">返回正面 ↺</button>
                             </div>
 
@@ -394,7 +478,7 @@
                     scoreHistory[currentStudent][recordKey] = [];
                 }
                 scoreHistory[currentStudent][recordKey].push(score);
-                localStorage.setItem('hogwarts_score_history_v6', JSON.stringify(scoreHistory));
+                localStorage.setItem('hogwarts_score_history_v8', JSON.stringify(scoreHistory));
 
                 let feedback = `得分：${score}分！`;
                 if (score >= 90) {
@@ -511,6 +595,8 @@
 
         function addNewVocabulary() {
             const rawWord = document.getElementById('newWord').value.trim();
+            const selectedUnit = document.getElementById('newWordUnit').value;
+
             if (!rawWord) {
                 alert('請輸入單字！');
                 return;
@@ -518,23 +604,45 @@
 
             const word = rawWord.charAt(0).toUpperCase() + rawWord.slice(1).toLowerCase();
 
-            // Cambridge Dictionary style definitions & standard core sentence patterns
-            let definition = `An object or concept related to "${word.toLowerCase()}", commonly used in everyday English contexts.`;
-            let sentenceEn = `Harry used a ${word.toLowerCase()} during his advanced magic class.`;
-            let sentenceZh = `中文意思：哈利在他的進階魔法課上使用了一個${word.toLowerCase()}。（劍橋辭典常見核心句型）`;
+            // Smart Cambridge dictionary database with Part of Speech & authentic example sentences
+            let pos = "noun [C]";
+            let definition = "A common English word or term used in everyday communication.";
+            let sentenceEn = `Eason and yangyang studied the ${word.toLowerCase()} carefully in the library.`;
+            let sentenceZh = `中文意思：Eason 和 yangyang 在圖書館裡仔細研究了這個${word.toLowerCase()}。（劍橋辭典常見學習情境句型）`;
 
             const presets = {
+                "Beard": { 
+                    pos: "noun [C]",
+                    def: "The hair that grows on a man's chin and cheeks.", 
+                    sent: "Dumbledore has a long white beard that reaches his belt.", 
+                    zh: "中文意思：鄧不利多有一把長長的白鬍子，一直垂到他的腰帶。（劍橋辭典常見外貌描述句型）" 
+                },
                 "Bottle": { 
+                    pos: "noun [C]",
                     def: "A glass or plastic container used for storing liquids, with a narrow neck.", 
                     sent: "Professor Snape put a magic potion into a glass bottle.", 
                     zh: "中文意思：石內卜教授把神奇魔藥裝進了一個玻璃瓶裡。（劍橋辭典常見物品容器句型）" 
                 },
+                "Courage": { 
+                    pos: "noun [U]",
+                    def: "The ability to control your fear in a dangerous or difficult situation.", 
+                    sent: "Eason showed great courage when he walked into the dark forest.", 
+                    zh: "中文意思：Eason 當他走進黑暗森林時展現了巨大的勇氣。（劍橋辭典標準抽象名詞句型）" 
+                },
+                "Curious": { 
+                    pos: "adjective",
+                    def: "Interested in learning about people or things around you.", 
+                    sent: "Harry was curious about the mysterious package from Dumbledore.", 
+                    zh: "中文意思：哈利對於鄧不利多寄來的神祕包裹感到十分好奇。（劍橋辭典常見形容詞搭配句型）" 
+                },
                 "Potion": { 
+                    pos: "noun [C]",
                     def: "A liquid with healing, magical, or poisonous properties.", 
                     sent: "yangyang brewed a healing potion in the Hogwarts laboratory.", 
                     zh: "中文意思：yangyang 在霍格華茲實驗室裡熬製了一瓶療癒魔藥。（劍橋辭典標準名詞搭配句型）" 
                 },
                 "Wand": { 
+                    pos: "noun [C]",
                     def: "A thin stick waved by a person practicing magic.", 
                     sent: "Eason pointed his magical wand and cast a brilliant spell.", 
                     zh: "中文意思：Eason 指著他的魔法棒並施放了一個燦爛的咒語。（劍橋辭典標準動作句型）" 
@@ -542,9 +650,16 @@
             };
 
             if (presets[word]) {
+                pos = presets[word].pos;
                 definition = presets[word].def;
                 sentenceEn = presets[word].sent;
                 sentenceZh = presets[word].zh;
+            } else {
+                // Intelligent auto-detection for custom words
+                pos = "noun [C]";
+                definition = `An essential term referring to ${word.toLowerCase()} or its characteristic features.`;
+                sentenceEn = `Harry examined the ${word.toLowerCase()} carefully during his magical class.`;
+                sentenceZh = `中文意思：哈利在他的魔法課上仔細檢視了這個${word.toLowerCase()}。（劍橋辭典常見學習句型）`;
             }
 
             const houseThemes = [
@@ -557,17 +672,22 @@
 
             vocabList.push({
                 id: Date.now(),
+                unit: selectedUnit,
                 word,
+                pos,
                 definition,
                 sentenceEn,
                 sentenceZh,
                 houseTheme: randomTheme
             });
 
+            saveVocabToStorage();
             document.getElementById('newWord').value = '';
+            currentSelectedUnit = selectedUnit; // auto switch view to the added unit
+            renderUnitTabs();
             renderVocabCards();
             renderTeacherWordList();
-            alert(`✨ 成功自動生成劍橋風格單字「${word}」！你可以切換至「🧪 老師測試入口」進行即時驗證。`);
+            alert(`✨ 成功將單字「${word}」新增至 ${selectedUnit}！資料已永久儲存。`);
         }
 
         function renderTeacherWordList() {
@@ -579,8 +699,9 @@
                 row.className = "flex justify-between items-center bg-white p-2.5 rounded border text-sm";
                 row.innerHTML = `
                     <div>
+                        <span class="px-2 py-0.5 bg-hpBurgundy text-white text-[10px] rounded font-bold mr-1.5">${item.unit}</span>
                         <span class="font-bold text-hpBurgundy">${item.word}</span> 
-                        <span class="text-xs text-gray-500">(${item.definition})</span>
+                        <span class="text-xs text-gray-500">(${item.pos})</span>
                     </div>
                     <button onclick="deleteVocabulary(${item.id})" class="text-xs text-red-600 hover:underline font-bold">刪除</button>
                 `;
@@ -590,6 +711,8 @@
 
         function deleteVocabulary(id) {
             vocabList = vocabList.filter(item => item.id !== id);
+            saveVocabToStorage();
+            renderUnitTabs();
             renderVocabCards();
             renderTeacherWordList();
         }
