@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Magic English Hub | 魔法英語學習網 v12.5</title>
+<title>Magic English Hub | 魔法英語學習網 v12.6</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cinzel:wght@600&display=swap" rel="stylesheet">
 <style>
@@ -96,7 +96,7 @@ textarea{min-height:68px;resize:vertical}
 footer{border-top:1px solid #746b70;background:#0e1d37;text-align:center;padding:16px;color:var(--pink);font-size:12px}
 button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid #d49c51;outline-offset:2px}
 
-.storage-status{margin-top:8px;opacity:.9}footer button{font-size:12px;padding:6px 10px}@media(max-width:600px){.wrap{padding:12px}header .wrap{padding:16px 12px 58px}main{padding:16px 12px}.face{min-height:300px}dialog{padding:15px}.moon,.candles{display:none}}
+[hidden]{display:none!important}.storage-status{margin-top:8px;opacity:.9}footer button{font-size:12px;padding:6px 10px}@media(max-width:600px){.wrap{padding:12px}header .wrap{padding:16px 12px 58px}main{padding:16px 12px}.face{min-height:300px}dialog{padding:15px}.moon,.candles{display:none}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.trail{display:none}}
 </style>
 </head>
@@ -133,7 +133,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 <section class="panel"><div class="bar"><strong>📜 魔法課程</strong><span id="unitButtons" class="bar"></span></div></section>
 <h2 class="heading" id="pageTitle">✨ Eason 的魔法單字</h2><p class="muted" style="text-align:center">聽發音、看定義、翻面練習例句。</p><div id="status" class="status" role="status" aria-live="polite"></div><div id="cards" class="cards"></div>
 </main>
-<footer>🪄 Magic English Hub · Eason & Yangyang · v12.5<div id="storageStatus" class="storage-status"></div><div class="bar" style="justify-content:center;margin-top:8px"><button id="footExport">⬇️ 下載成績備份</button><button id="footImport">⬆️ 還原成績備份</button></div></footer>
+<footer>🪄 Magic English Hub · Eason & Yangyang · v12.6<div id="storageStatus" class="storage-status"></div><div class="bar" style="justify-content:center;margin-top:8px"><button id="footExport">⬇️ 下載成績備份</button><button id="footImport">⬆️ 還原成績備份</button></div></footer>
 
 <dialog id="teacherDialog"><div class="bar"><h2 style="flex:1">🏰 教師管理大廳</h2><button id="teacherClose">關閉 ✕</button></div>
 <div class="notice">教師管理已加上密碼保護，可避免學生誤入。但此版本為靜態網站，密碼寫在網頁程式碼中，懂技術的人仍可查看，並非真正的安全驗證；若需要嚴格限制，需串接安全登入與雲端資料庫。請勿在公開共用裝置使用教師管理功能。</div>
@@ -142,6 +142,11 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 <label>英文例句<textarea id="editSentence" placeholder="字典沒有提供例句時，可按「產生簡單例句」或自行輸入"></textarea></label><label>例句中文翻譯（選填）<textarea id="editZh" placeholder="請輸入真正的中文翻譯"></textarea></label>
 <div class="note">字典查詢只填入確實取得的詞性與定義。字典沒有例句時，會依詞性自動產生最簡單的句型（SV 或 SVO）當作例句，請確認是否通順，也可自行改寫。美式錄音若有來源會優先使用，否則使用裝置內建 en-US 語音。</div><div class="bar"><button id="saveWord" class="primary">💾 確認並儲存</button><span id="editHint" class="small"></span></div><div id="saveMsg" class="status" role="alert" style="margin-top:8px"></div></div>
 <div class="section"><h3>📋 現有單字</h3><div id="teacherList"></div></div>
+<div class="section"><h3>🧹 學生成績管理</h3><p class="small">清除後，該學習者的發音練習紀錄、分數曲線與魔法點數會歸零，可以重新開始記錄。單字內容不會受影響。</p>
+<div class="formgrid"><label>學習者<select id="clearStudent"><option value="Eason">Eason</option><option value="yangyang">Yangyang</option><option value="TestPortal">老師測試</option><option value="*">全部學習者</option></select></label><label>範圍<select id="clearUnit"></select></label></div>
+<div id="clearInfo" class="small" style="margin:8px 0;color:#273047"></div>
+<label style="font-weight:normal"><input type="checkbox" id="clearBackup" checked style="display:inline;width:auto;margin:0 6px 0 0">清除前先下載備份（建議，之後可用「還原成績備份」救回）</label>
+<div class="bar" style="margin-top:10px"><button id="clearBtn" class="red">🧹 清除成績</button></div><div id="clearMsg" class="status" style="color:#287348" role="status"></div></div>
 <div class="section"><h3>🗃️ 備份與還原</h3><p class="small">資料目前只保存在這個瀏覽器，不會同步到其他裝置。請定期下載備份；匯入時會合併並去除同單元重複單字。</p><div class="bar"><button id="exportBtn">⬇️ 下載單字與紀錄備份</button><button id="importBtn">⬆️ 匯入備份</button><input type="file" id="importFile" accept=".json,application/json" hidden></div></div>
 </dialog>
 
@@ -478,6 +483,19 @@ actions.append(action('編輯',()=>{state.editingId=it.id;$('editUnit').value=it
 action('刪除',()=>{if(!confirm(`確定刪除 ${it.unit} 的「${it.word}」嗎？`))return;const next=state.wordList.filter(x=>x.id!==it.id);if(persistWords(next)){state.wordList=next;render();notify('已刪除 '+it.word)}}));row.append(label,actions);host.append(row)}}
 
 /* ---------- 備份與還原 ---------- */
+function keyUnit(k){const m=String(k).match(/_(?:word|sent)_(Unit \d+)\|/);return m?m[1]:null}
+function clearTargets(){const st=$('clearStudent').value;return st==='*'?Object.keys(state.history):[st]}
+function countScores(student,unit){let n=0;const h=state.history[student]||{};for(const k in h){if(unit&&keyUnit(k)!==unit)continue;n+=Array.isArray(h[k])?h[k].length:0}return n}
+function pointsOf(student,unit){const pu=pointsByUnit(student);return unit?(pu[unit]||0):Object.values(pu).reduce((a,b)=>a+b,0)}
+function updateClearInfo(){const unit=$('clearUnit').value==='*'?'':$('clearUnit').value;const scope=unit||'全部單元';$('clearInfo').textContent=clearTargets().map(st=>`${displayName(st)}｜${scope}：${countScores(st,unit)} 筆練習紀錄、${pointsOf(st,unit)} 魔法點數`).join('　／　')}
+function clearScores(){const unit=$('clearUnit').value==='*'?'':$('clearUnit').value,targets=clearTargets(),scope=unit||'全部單元';const total=targets.reduce((n,st)=>n+countScores(st,unit),0);
+const names=targets.map(displayName).join('、');
+if(!total&&!targets.some(st=>Object.keys(state.history[st]||{}).length&&!unit)){$('clearMsg').style.color='#af3030';$('clearMsg').textContent='⚠️ 沒有可清除的紀錄。';return}
+if(!confirm(`確定要清除「${names}」${scope}的練習成績嗎？\n共 ${total} 筆練習紀錄會被刪除，此動作無法復原。`))return;
+if($('clearBackup').checked)exportData();
+for(const st of targets){if(!unit)state.history[st]={};else{const h=state.history[st]||{};for(const k of Object.keys(h))if(keyUnit(k)===unit)delete h[k]}}
+if(!storageSet(HISTORY_KEY,state.history)){$('clearMsg').style.color='#af3030';$('clearMsg').textContent='⚠️ 清除失敗：'+lastStorageError;return}
+recordBoot();render();updateClearInfo();$('clearMsg').style.color='#287348';$('clearMsg').textContent=`✓ 已清除「${names}」${scope}的成績（${total} 筆），可以重新開始記錄。`+($('clearBackup').checked?'備份檔已下載。':'');notify(`已清除 ${names} ${scope}的成績`)}
 function exportData(){const data={format:'hogwarts-english-backup',version:12,exportedAt:new Date().toISOString(),vocabulary:state.wordList.filter(x=>!x.builtin),history:state.history};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='magic-english-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}
 async function importData(file){if(!file)return;try{const obj=JSON.parse(await file.text());if(obj.format!=='hogwarts-english-backup'||!Array.isArray(obj.vocabulary))throw new Error('不是此網站產生的備份檔');const incoming=dedup(obj.vocabulary.map(x=>({...x,builtin:false})));if(!incoming.length&&!(obj.history&&typeof obj.history==='object'))throw new Error('備份中沒有單字或成績');if(!confirm(`要匯入 ${incoming.length} 筆自訂單字與備份中的練習成績，並與現有資料合併嗎？`))return;const merged=dedup([...state.wordList,...incoming]);if(!persistWords(merged))return;state.wordList=merged;if(obj.history&&typeof obj.history==='object'){for(const student of ['Eason','yangyang','TestPortal']){state.history[student]={...(obj.history[student]||{}),...(state.history[student]||{})}}storageSet(HISTORY_KEY,state.history)}migrateHistory(obj.vocabulary);render();setLookupMessage(`匯入完成，目前共 ${merged.length} 筆單字。`,true);recordBoot();renderStorageStatus();notify('備份已匯入，成績已合併。')}catch(e){setLookupMessage('匯入失敗：'+e.message);notify('匯入失敗：'+e.message,true)}finally{$('importFile').value=''}}
 
@@ -495,12 +513,12 @@ document.querySelectorAll('[data-student]').forEach(b=>b.addEventListener('click
 $('teacherOpen').onclick=()=>{$('pwInput').value='';$('pwMsg').textContent='';$('pwDialog').showModal();$('pwInput').focus()};
 $('pwCancel').onclick=()=>$('pwDialog').close();
 $('pwForm').addEventListener('submit',e=>{e.preventDefault();const wait=Math.ceil((pwLockUntil-Date.now())/1000);if(wait>0){$('pwMsg').textContent=`嘗試次數過多，請等待 ${wait} 秒後再試。`;return}
-if($('pwInput').value===TEACHER_PIN){pwFails=0;$('pwInput').value='';$('pwDialog').close();$('teacherDialog').showModal();resetEdit()}
+if($('pwInput').value===TEACHER_PIN){pwFails=0;$('pwInput').value='';$('pwDialog').close();$('teacherDialog').showModal();resetEdit();updateClearInfo()}
 else{pwFails++;$('pwInput').value='';if(pwFails>=5){pwFails=0;pwLockUntil=Date.now()+30000;$('pwMsg').textContent='密碼錯誤次數過多，已暫停 30 秒。'}else $('pwMsg').textContent='密碼錯誤，請再試一次。';$('pwInput').focus()}});
 $('teacherClose').onclick=()=>$('teacherDialog').close();
 $('lookup').onclick=lookupDictionary;
 $('genSentence').onclick=()=>{const w=$('editWord').value.trim();if(!validWord(w)){setLookupMessage('請先輸入正確的英文單字。');return}const t=simpleSentence(w,$('editPos').value);if(!t){setLookupMessage('請先填寫詞性（noun / verb / adjective）；其他詞性不適合自動造句，請自行填寫例句。');return}$('editSentence').value=t;$('editZh').value='';setLookupMessage('已產生簡單例句，請確認是否通順。',true)};
-$('footExport').onclick=exportData;$('footImport').onclick=()=>$('importFile').click();$('saveWord').onclick=saveWord;$('resetEdit').onclick=resetEdit;$('exportBtn').onclick=exportData;$('importBtn').onclick=()=>$('importFile').click();$('importFile').onchange=e=>importData(e.target.files[0]);
+$('footExport').onclick=exportData;{const o=document.createElement('option');o.value='*';o.textContent='全部單元';$('clearUnit').append(o);for(const u of UNITS){const x=document.createElement('option');x.value=u;x.textContent=u;$('clearUnit').append(x)}}$('clearStudent').onchange=updateClearInfo;$('clearUnit').onchange=updateClearInfo;$('clearBtn').onclick=clearScores;$('footImport').onclick=()=>$('importFile').click();$('saveWord').onclick=saveWord;$('resetEdit').onclick=resetEdit;$('exportBtn').onclick=exportData;$('importBtn').onclick=()=>$('importFile').click();$('importFile').onchange=e=>importData(e.target.files[0]);
 for(const u of UNITS){const o=document.createElement('option');o.value=u;o.textContent=u;$('editUnit').append(o)}$('editUnit').value=state.unit}
 init();
 </script>
