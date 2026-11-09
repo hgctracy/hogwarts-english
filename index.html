@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Magic English Hub | 魔法英語學習網 v12.1</title>
+<title>Magic English Hub | 魔法英語學習網 v12.3</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cinzel:wght@600&display=swap" rel="stylesheet">
 <style>
@@ -67,7 +67,7 @@ button:disabled{opacity:.55;cursor:not-allowed}
 .seal{position:absolute;top:12px;right:14px;width:34px;height:34px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#c0392b,#74151d 70%);color:var(--gold);display:grid;place-items:center;font-size:15px;box-shadow:0 2px 6px #0006,inset 0 0 6px #0005}
 .face h3{font-family:'Cinzel','Noto Serif TC',Georgia,serif;font-size:30px;margin:4px 0;color:#192b49}
 .face .definition{font-size:15px;margin:0}
-.face .pos{color:var(--burgundy);font-style:italic;font-size:13px}
+.face .pos{color:var(--burgundy);font-style:italic;font-size:13px}.plural{align-self:flex-start;font-size:13px;color:#3d4a68;background:#efe3c3;border:1px solid #d9c18a;border-radius:8px;padding:2px 9px}.tense{align-self:flex-start;font-size:12px;color:var(--burgundy);background:#f7e4da;border:1px solid #e3b9a6;border-radius:8px;padding:2px 9px}
 .face .example{font-size:18px;margin:6px 0;border-top:1px solid #d9c9a6;padding-top:10px}
 .face .grow{flex:1}
 .actions{margin-top:auto;display:flex;flex-wrap:wrap;gap:8px}
@@ -128,16 +128,16 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 </svg>
 </header>
 <main>
-<section class="panel"><div class="bar"><strong>🧙 選擇魔法學徒</strong><button data-student="Eason" class="active">Eason</button><button data-student="yangyang">Yangyang</button><button data-student="TestPortal">🧪 老師測試</button><button id="soundTest" class="push">🔈 測試聲音</button></div><div id="points" class="points"></div></section>
+<section class="panel"><div class="bar"><strong>🧙 選擇魔法學徒</strong><button data-student="Eason" class="active">Eason</button><button data-student="yangyang">Yangyang</button><button data-student="TestPortal">🧪 老師測試</button></div><div id="points" class="points"></div></section>
 <section class="panel"><div class="bar"><strong>📜 魔法課程</strong><span id="unitButtons" class="bar"></span></div></section>
 <h2 class="heading" id="pageTitle">✨ Eason 的魔法單字</h2><p class="muted" style="text-align:center">聽發音、看定義、翻面練習例句。</p><div id="status" class="status" role="status" aria-live="polite"></div><div id="cards" class="cards"></div>
 </main>
-<footer>🪄 Magic English Hub · Eason & Yangyang · v12.1</footer>
+<footer>🪄 Magic English Hub · Eason & Yangyang · v12.3</footer>
 
 <dialog id="teacherDialog"><div class="bar"><h2 style="flex:1">🏰 教師管理大廳</h2><button id="teacherClose">關閉 ✕</button></div>
 <div class="notice">教師管理已加上密碼保護，可避免學生誤入。但此版本為靜態網站，密碼寫在網頁程式碼中，懂技術的人仍可查看，並非真正的安全驗證；若需要嚴格限制，需串接安全登入與雲端資料庫。請勿在公開共用裝置使用教師管理功能。</div>
 <div class="section"><h3>🪄 新增／編輯單字</h3><div class="formgrid"><label>單元<select id="editUnit"></select></label><label>英文單字<input id="editWord" autocomplete="off" placeholder="例如 pancake"></label></div><div class="bar" style="margin:10px 0"><button id="lookup" class="primary">🌐 查詢字典</button><button id="genSentence">✍️ 產生簡單例句</button><button id="resetEdit">清空欄位</button></div><div id="lookupStatus" class="status" style="color:#74151d" role="status"></div>
-<div class="formgrid"><label>詞性<input id="editPos" placeholder="noun / verb / adjective"></label><label>英文定義<textarea id="editDefinition" placeholder="請確認定義符合學生程度"></textarea></label></div>
+<div class="formgrid"><label>詞性<input id="editPos" placeholder="noun / verb / adjective"></label><label>名詞複數（選填）<input id="editPlural" placeholder="例如 beards；不可數請填 -"></label><label>英文定義<textarea id="editDefinition" placeholder="請確認定義符合學生程度"></textarea></label></div>
 <label>英文例句<textarea id="editSentence" placeholder="字典沒有提供例句時，可按「產生簡單例句」或自行輸入"></textarea></label><label>例句中文翻譯（選填）<textarea id="editZh" placeholder="請輸入真正的中文翻譯"></textarea></label>
 <div class="note">字典查詢只填入確實取得的詞性與定義。字典沒有例句時，會依詞性自動產生最簡單的句型（SV 或 SVO）當作例句，請確認是否通順，也可自行改寫。美式錄音若有來源會優先使用，否則使用裝置內建 en-US 語音。</div><div class="bar"><button id="saveWord" class="primary">💾 確認並儲存</button><span id="editHint" class="small"></span></div><div id="saveMsg" class="status" role="alert" style="margin-top:8px"></div></div>
 <div class="section"><h3>📋 現有單字</h3><div id="teacherList"></div></div>
@@ -160,7 +160,149 @@ const TEACHER_PIN='0000';
 let lastStorageError='',pwFails=0,pwLockUntil=0,ttsUtter=null;
 const SPEED={normal:1,slow:.6};
 const UNITS=Array.from({length:12},(_,i)=>'Unit '+(i+1));
-const DEFAULT=[{id:1,unit:'Unit 1',word:'Beard',pos:'noun [C]',definition:"The hair that grows on a man's chin and cheeks.",sentenceEn:'Dumbledore has a long white beard that reaches his belt.',sentenceZh:'鄧不利多有一把長長的白鬍子，一直垂到他的腰帶。'},{id:2,unit:'Unit 1',word:'Bottle',pos:'noun [C]',definition:'A glass or plastic container used for storing liquids, with a narrow neck.',sentenceEn:'Professor Snape put a magic potion into a glass bottle.',sentenceZh:'石內卜教授把神奇魔藥裝進玻璃瓶裡。'}];
+// ===== 內建單字：[單元, 顯示文字, 朗讀文字(空=同顯示), 詞性, 英文定義, 例句, 例句中文, 例句時態, 名詞複數] =====
+// 名詞複數：直接寫複數形；"-" = 不可數；"=" 開頭 = 自訂說明；空字串 = 非名詞
+// 新增單字時請「加在最後面」。內建單字不會寫入瀏覽器儲存，所以所有裝置看到的都一樣。
+const BUILTIN_RAW=[
+["Unit 1", "Beard", "", "noun", "The hair that grows on a man's chin and cheeks.", "Dumbledore stroked his long white beard and smiled.", "鄧不利多摸著他長長的白鬍子，微微一笑。", "過去簡單式 Past Simple", "beards"],
+["Unit 1", "curly", "", "adjective", "Curly hair is not straight. It has small round twists.", "Do you have curly hair or straight hair?", "你的頭髮是捲髮還是直髮？", "疑問句・現在簡單式 Present Simple", ""],
+["Unit 1", "ground", "", "noun", "The surface of the Earth that you walk on.", "Do not throw your trash on the ground.", "不要把垃圾丟在地上。", "否定祈使句 Do not ...", "-"],
+["Unit 1", "leaf / leaves", "leaf, leaves", "noun", "A flat, usually green part of a plant. The plural form is leaves.", "The leaves turned red and yellow last autumn.", "去年秋天，樹葉變成了紅色和黃色。", "過去簡單式 Past Simple", "=單數 leaf → 複數 leaves"],
+["Unit 1", "lion", "", "noun", "A big wild cat with a loud roar. The male has long hair around its head.", "A lion is going to visit our school tomorrow!", "明天會有一隻獅子來我們學校參觀！", "未來式 be going to", "lions"],
+["Unit 1", "mustache", "", "noun", "The hair that grows above a man's mouth.", "Draw a big funny mustache on the clown!", "在小丑臉上畫一撇好笑的大鬍子！", "祈使句 Imperative", "mustaches"],
+["Unit 1", "neck", "", "noun", "The part of the body between your head and your shoulders.", "The giraffe is stretching its long neck to eat leaves.", "長頸鹿正伸長牠長長的脖子在吃樹葉。", "現在進行式 Present Continuous", "necks"],
+["Unit 1", "rabbit", "", "noun", "A small animal with long ears. It hops and eats plants.", "I will name my pet rabbit Snowball.", "我要把我的寵物兔取名叫雪球。", "未來式 will", "rabbits"],
+["Unit 1", "shoulder", "", "noun", "The part of your body between your neck and your arm.", "Touch your left shoulder with your right hand.", "用你的右手碰你的左肩。", "祈使句 Imperative", "shoulders"],
+["Unit 1", "tall", "", "adjective", "Having a large height. Not short.", "Who is taller, you or your best friend?", "你和你的好朋友，誰比較高？", "疑問句・比較級 Comparative", ""],
+["Unit 1", "tooth / teeth", "tooth, teeth", "noun", "A tooth is a hard, white part in your mouth that you use to bite and chew. The plural form is teeth.", "Did you brush your teeth this morning?", "你今天早上有刷牙嗎？", "疑問句・過去簡單式 Past Simple", "=單數 tooth → 複數 teeth"],
+["Unit 1", "thin", "", "adjective", "Not fat or thick.", "The thin cat climbed through the small hole.", "那隻瘦瘦的貓從小洞爬了過去。", "過去簡單式 Past Simple", ""],
+["Unit 2", "cook", "", "verb", "To make food ready to eat by heating it.", "Let us cook noodles for dinner tonight!", "今晚我們一起煮麵當晚餐吧！", "提議句 Let us ...", ""],
+["Unit 2", "dance", "", "noun, verb", "(verb) To move your body to music. (noun) A set of steps that you do to music.", "Can you dance like a robot?", "你會像機器人一樣跳舞嗎？", "疑問句・情態動詞 can / must / should", "dances"],
+["Unit 2", "grandparent", "", "noun", "The mother or father of your mother or father.", "I visited my grandparents last weekend.", "我上週末去探望了爺爺奶奶。", "過去簡單式 Past Simple", "grandparents"],
+["Unit 2", "huge", "", "adjective", "Very, very big.", "We saw a huge dog in the park!", "我們在公園裡看到一隻超大的狗！", "過去簡單式 Past Simple", ""],
+["Unit 2", "map", "", "noun", "A drawing that shows where places are.", "Use the map to find the treasure.", "用地圖去找出寶藏。", "祈使句 Imperative", "maps"],
+["Unit 2", "parent", "", "noun", "Your mother or your father.", "Please give this letter to your parents.", "請把這封信交給你的爸媽。", "祈使句 Imperative", "parents"],
+["Unit 2", "town center", "", "noun", "The middle part of a town, where there are many shops and offices.", "How can I get to the town center?", "請問我要怎麼去市中心？", "疑問句・情態動詞 can / must / should", "town centers"],
+["Unit 2", "weekend", "", "noun", "Saturday and Sunday.", "What are you going to do this weekend?", "這個週末你打算做什麼？", "疑問句・未來式 be going to", "weekends"],
+["Unit 2", "world", "", "noun", "The Earth and all the people and places on it.", "I will travel around the world one day.", "有一天我要環遊世界。", "未來式 will", "worlds"],
+["Unit 3", "clown", "", "noun", "A funny person in a circus who wears silly clothes.", "The clown was riding a tiny bike at the party.", "小丑那時正在派對上騎著一輛小小的腳踏車。", "過去進行式 Past Continuous", "clowns"],
+["Unit 3", "coat", "", "noun", "A warm piece of clothing that you wear over your other clothes outside.", "Put on your coat because it is cold outside.", "穿上外套，因為外面很冷。", "祈使句 Imperative", "coats"],
+["Unit 3", "cold", "", "adjective, noun", "(adjective) Not warm. Having a low temperature. (noun) A common illness that makes your nose run.", "I have a cold, so I must stay home.", "我感冒了，所以我必須待在家裡。", "情態動詞 can / must / should", "colds"],
+["Unit 3", "helmet", "", "noun", "A hard hat that protects your head.", "You must wear a helmet when you ride a bike.", "騎腳踏車時一定要戴安全帽。", "情態動詞 can / must / should", "helmets"],
+["Unit 3", "ice", "", "noun", "Water that has frozen. It is hard and cold.", "Would you like some ice in your drink?", "你的飲料要加冰塊嗎？", "禮貌請求 Polite Request", "-"],
+["Unit 3", "parrot", "", "noun", "A colorful bird that can copy people's words.", "Our parrot learned to say hello yesterday.", "我們的鸚鵡昨天學會說哈囉了。", "過去簡單式 Past Simple", "parrots"],
+["Unit 3", "party", "", "noun", "An event where people meet to eat, play, and have fun.", "I am having a pizza party on Saturday.", "我星期六要辦披薩派對。", "現在進行式 Present Continuous（近期計畫）", "parties"],
+["Unit 3", "pirate", "", "noun", "A person who sails on the sea and steals from ships.", "The pirate has hidden his gold under a big tree.", "海盜把他的金子藏在一棵大樹下了。", "現在完成式 Present Perfect", "pirates"],
+["Unit 3", "roller skates / skating", "roller skates, roller skating", "noun", "Roller skates are shoes with wheels on the bottom. Roller skating is moving on them.", "Where did you get your new roller skates?", "你的新溜冰鞋是在哪裡買的？", "疑問句・過去簡單式 Past Simple", "=單數 roller skate → 複數 roller skates（roller skating 不可數）"],
+["Unit 3", "sunny", "", "adjective", "With bright light from the sun.", "It will be sunny tomorrow, so let us have a picnic!", "明天會是晴天，所以我們去野餐吧！", "未來式 will", ""],
+["Unit 3", "surprised", "", "adjective", "Feeling shocked because something happened that you did not expect.", "We were surprised when the lights went out.", "燈突然熄滅時，我們都嚇了一跳。", "過去簡單式 Past Simple", ""],
+["Unit 3", "sweater", "", "noun", "A warm piece of clothing with long sleeves, often made of wool.", "Whose red sweater is on the floor?", "地板上那件紅毛衣是誰的？", "疑問句・現在簡單式 Present Simple", "sweaters"],
+["Unit 3", "ticket", "", "noun", "A small piece of paper that lets you enter a place or travel.", "I have already bought two tickets for the show.", "我已經買好兩張表演的票了。", "現在完成式 Present Perfect", "tickets"],
+["Unit 3", "weather", "", "noun", "What it is like outside, such as sunny, rainy, or windy.", "What is the weather like today?", "今天天氣怎麼樣？", "疑問句・現在簡單式 Present Simple", "-"],
+["Unit 4", "bottle", "", "noun", "A glass or plastic container used for storing liquids, with a narrow neck.", "Professor Snape put a magic potion into a glass bottle.", "石內卜教授把神奇魔藥裝進玻璃瓶裡。", "過去簡單式 Past Simple", "bottles"],
+["Unit 4", "bowl", "", "noun", "A round, deep dish for food or drinks.", "Can I have another bowl of rice, please?", "請問我可以再來一碗飯嗎？", "禮貌請求 Polite Request", "bowls"],
+["Unit 4", "café", "", "noun", "A small place where you can buy drinks and light meals.", "We are going to meet at the café after school.", "放學後我們要在咖啡館碰面。", "未來式 be going to", "cafés"],
+["Unit 4", "coffee", "", "noun", "A hot brown drink made from roasted beans.", "My mom drinks coffee, but I drink milk.", "我媽媽喝咖啡，但是我喝牛奶。", "現在簡單式 Present Simple", "=通常不可數；點餐時可說 two coffees（兩杯咖啡）"],
+["Unit 4", "homework", "", "noun", "School work that you do at home.", "I have finished my homework, so can I play now?", "我已經寫完功課了，現在可以去玩了嗎？", "現在完成式 Present Perfect", "-"],
+["Unit 4", "hot", "", "adjective", "Having a high temperature. Very warm.", "Be careful, the soup is very hot!", "小心，這碗湯很燙！", "祈使句 Imperative", ""],
+["Unit 4", "market", "", "noun", "A place where people buy and sell food and other things.", "Last Sunday, we bought fresh fruit at the market.", "上個星期天，我們在市場買了新鮮的水果。", "過去簡單式 Past Simple", "markets"],
+["Unit 4", "milkshake", "", "noun", "A cold, sweet drink made from milk and ice cream.", "I would like a chocolate milkshake, please.", "請給我一杯巧克力奶昔。", "禮貌請求 Polite Request", "milkshakes"],
+["Unit 4", "noodles", "", "noun", "Long, thin strips of food made from flour. You cook them in water.", "Slurp, slurp! I am eating hot noodles.", "呼嚕呼嚕！我正在吃熱騰騰的麵。", "現在進行式 Present Continuous", "=本身已是複數；單數 noodle（一條麵）"],
+["Unit 4", "pancake", "", "noun", "A flat, round cake that you cook in a pan.", "Dad flipped the pancake so high that it landed on the cat!", "爸爸把鬆餅翻得好高，結果掉到貓身上了！", "過去簡單式 Past Simple", "pancakes"],
+["Unit 4", "plant", "", "noun", "A living thing that grows in the ground, such as a flower or a tree.", "Please water the plant every morning.", "請每天早上幫植物澆水。", "祈使句 Imperative", "plants"],
+["Unit 4", "plate", "", "noun", "A flat dish that you eat food from.", "Put your plate in the sink after dinner.", "晚餐後，請把你的盤子放進水槽。", "祈使句 Imperative", "plates"],
+["Unit 4", "salad", "", "noun", "A cold dish made of raw vegetables.", "Eat your salad, and you will become big and strong!", "把沙拉吃完，你就會長得又高又壯！", "祈使句 Imperative + 未來式 will", "salads"],
+["Unit 4", "sandwich", "", "noun", "Two pieces of bread with food in the middle.", "How many sandwiches did you eat at the picnic?", "你在野餐時吃了幾個三明治？", "疑問句・過去簡單式 Past Simple", "sandwiches"],
+["Unit 4", "sauce", "", "noun", "A thick liquid that you put on food to give it taste.", "Do you want tomato sauce on your pasta?", "你的義大利麵要加番茄醬嗎？", "疑問句・現在簡單式 Present Simple", "sauces"],
+["Unit 4", "soup", "", "noun", "A hot liquid food made with vegetables or meat.", "Mom is making chicken soup for us.", "媽媽正在為我們煮雞湯。", "現在進行式 Present Continuous", "=通常不可數（two bowls of soup）；soups 指不同種類的湯"],
+["Unit 4", "vegetable", "", "noun", "A plant that you eat, such as a carrot or a potato.", "You should eat a vegetable at every meal.", "每一餐你都應該吃一些蔬菜。", "情態動詞 can / must / should", "vegetables"],
+["Unit 5", "cinema", "", "noun", "A place where you go to watch movies. In the US, people also say \"movie theater\".", "Do you want to go to the cinema with me on Friday?", "星期五你想和我一起去看電影嗎？", "疑問句・現在簡單式 Present Simple", "cinemas"],
+["Unit 5", "circus", "", "noun", "A show with clowns, animals, and people who do tricks.", "I saw a lion jump through a ring at the circus.", "我在馬戲團看到一隻獅子跳過一個圈圈。", "過去簡單式 Past Simple", "circuses"],
+["Unit 5", "city", "", "noun", "A very large town where many people live and work.", "I live in a big city, but my cousin lives in the countryside.", "我住在大城市，但我表哥住在鄉下。", "現在簡單式 Present Simple", "cities"],
+["Unit 5", "dentist", "", "noun", "A doctor who looks after your teeth.", "I have to go to the dentist on Monday.", "星期一我得去看牙醫。", "情態動詞 have to", "dentists"],
+["Unit 5", "doctor", "", "noun", "A person who helps sick people get better.", "When I grow up, I will be a doctor.", "我長大以後要當醫生。", "未來式 will", "doctors"],
+["Unit 5", "driver", "", "noun", "A person who drives a car, bus, or truck.", "The bus driver waved at us this morning.", "公車司機今天早上對我們揮了揮手。", "過去簡單式 Past Simple", "drivers"],
+["Unit 5", "famous", "", "adjective", "Known by many people.", "My uncle is famous for making funny videos.", "我叔叔因為拍搞笑影片而出名。", "現在簡單式 Present Simple", ""],
+["Unit 5", "farm / farmer", "farm, farmer", "noun", "A farm is land where people grow food or keep animals. A farmer is a person who works on a farm.", "The farmer gets up early to feed the animals on the farm.", "農夫很早起床，餵農場裡的動物。", "現在簡單式 Present Simple", "=farm → farms；farmer → farmers"],
+["Unit 5", "film / movie", "film, movie", "noun", "A story that you watch on a screen, in a theater or at home.", "Have you seen that funny movie yet?", "你看過那部好笑的電影了嗎？", "疑問句・現在完成式 Present Perfect", "=film → films；movie → movies"],
+["Unit 5", "hospital", "", "noun", "A building where doctors and nurses look after sick people.", "We made a card for our sick friend at the hospital.", "我們為住在醫院的生病朋友做了一張卡片。", "過去簡單式 Past Simple", "hospitals"],
+["Unit 5", "nurse", "", "noun", "A person who looks after sick people in a hospital.", "The nurse is taking my temperature.", "護理師正在幫我量體溫。", "現在進行式 Present Continuous", "nurses"],
+["Unit 5", "river", "", "noun", "A long stream of water that flows to the sea.", "We will sail down the river on a little boat tomorrow.", "明天我們要搭小船沿著河流航行。", "未來式 will", "rivers"],
+["Unit 5", "treasure", "", "noun", "A lot of gold, silver, or other valuable things.", "We found a box of treasure at the beach!", "我們在海灘上找到了一箱寶藏！", "過去簡單式 Past Simple", "=通常不可數；treasures 指一件件珍寶"],
+["Unit 6", "circle", "", "noun", "A round shape like the letter O.", "Everyone, sit in a circle on the floor.", "大家請圍成一個圓圈坐在地上。", "祈使句 Imperative", "circles"],
+["Unit 6", "cough", "", "noun", "A sudden noise you make when air pushes out of your throat. You often cough when you are sick.", "I have had a cough since Monday.", "我從星期一就一直在咳嗽。", "現在完成式 Present Perfect", "coughs"],
+["Unit 6", "earache", "", "noun", "A pain in your ear.", "I had an earache last night, so I could not sleep.", "我昨晚耳朵痛，所以睡不著。", "過去簡單式 Past Simple", "earaches"],
+["Unit 6", "headache", "", "noun", "A pain in your head.", "If you play games too long, you will get a headache.", "如果你玩遊戲玩太久，你會頭痛。", "條件句 If ... will", "headaches"],
+["Unit 6", "penguin", "", "noun", "A black and white bird that cannot fly but swims very well.", "Penguins cannot fly, but they can swim very fast.", "企鵝不會飛，但牠們游得非常快。", "現在簡單式 Present Simple", "penguins"],
+["Unit 6", "quiet", "", "adjective", "Making little or no noise.", "Please be quiet because the baby is sleeping.", "請安靜，因為寶寶正在睡覺。", "祈使句 Imperative", ""],
+["Unit 6", "stomach", "", "noun", "The part inside your body where food goes after you eat it.", "My stomach hurts because I ate too much ice cream.", "我肚子痛，因為我吃了太多冰淇淋。", "現在簡單式 Present Simple + 過去簡單式 Past Simple", "stomachs"],
+["Unit 6", "stomach-ache", "", "noun", "A pain in your stomach.", "She stayed home because she had a stomach-ache.", "她因為肚子痛而待在家裡。", "過去簡單式 Past Simple", "stomach-aches"],
+["Unit 6", "temperature", "", "noun", "How hot or cold something is.", "What will the temperature be tomorrow?", "明天的氣溫會是幾度？", "疑問句・未來式 will", "temperatures"],
+["Unit 6", "toothache", "", "noun", "A pain in your tooth.", "Too much candy will give you a toothache.", "吃太多糖果會讓你牙痛。", "未來式 will", "toothaches"],
+["Unit 6", "video", "", "noun, verb", "(noun) A recording of moving pictures. (verb) To record moving pictures with a camera.", "We are going to make a funny video for our class.", "我們要為班上拍一支好笑的影片。", "未來式 be going to", "videos"],
+["Unit 7", "band", "", "noun", "A group of people who play music together.", "My brother plays the drums in a band.", "我哥哥在樂團裡打鼓。", "現在簡單式 Present Simple", "bands"],
+["Unit 7", "bus station", "", "noun", "A place where buses start and stop.", "Excuse me, where is the bus station?", "不好意思，請問公車站在哪裡？", "疑問句・現在簡單式 Present Simple", "bus stations"],
+["Unit 7", "car park", "", "noun", "An area where you leave your car. In the US, people often say \"parking lot\".", "Dad parked the car in the car park behind the supermarket.", "爸爸把車停在超市後面的停車場。", "過去簡單式 Past Simple", "car parks"],
+["Unit 7", "floor", "", "noun", "The bottom surface of a room, or one level of a building.", "Which floor is the toy store on?", "玩具店在幾樓？", "疑問句・現在簡單式 Present Simple", "floors"],
+["Unit 7", "lift / elevator", "lift, elevator", "noun", "A machine that carries people up and down in a building. In the US, people say \"elevator\".", "The elevator is broken, so we have to take the stairs.", "電梯壞了，所以我們得走樓梯。", "現在簡單式 Present Simple + have to", "=lift → lifts；elevator → elevators"],
+["Unit 7", "seat", "", "noun", "A place where you can sit.", "Is this seat taken?", "這個位子有人坐嗎？", "疑問句・現在簡單式 Present Simple", "seats"],
+["Unit 7", "shop", "", "noun, verb", "(noun) A place where you buy things. (verb) To go to stores and buy things.", "My mom and I are shopping for new shoes today.", "我媽媽和我今天正在買新鞋子。", "現在進行式 Present Continuous", "shops"],
+["Unit 7", "shopping center", "", "noun", "A big building with many shops inside.", "We got lost in the shopping center yesterday.", "我們昨天在購物中心裡迷路了。", "過去簡單式 Past Simple", "shopping centers"],
+["Unit 7", "sports center", "", "noun", "A place with courts and rooms where people play sports.", "I will meet you at the sports center after school.", "放學後我在運動中心和你見面。", "未來式 will", "sports centers"],
+["Unit 7", "stair(s)", "stairs", "noun", "A set of steps that go up or down between floors.", "Do not run up and down the stairs.", "不要在樓梯上跑上跑下。", "否定祈使句 Do not ...", "=通常用複數 stairs；單數 stair（一階樓梯）"],
+["Unit 7", "supermarket", "", "noun", "A big store that sells food and other things for the home.", "Can you buy some milk at the supermarket for me?", "你可以幫我去超市買牛奶嗎？", "疑問句・情態動詞 can / must / should", "supermarkets"],
+["Unit 7", "swimming pool", "", "noun", "A big hole filled with water for swimming.", "I learned to swim in this swimming pool.", "我就是在這座游泳池學會游泳的。", "過去簡單式 Past Simple", "swimming pools"],
+["Unit 7", "week", "", "noun", "A period of seven days.", "I have swimming lessons twice a week.", "我每週上兩次游泳課。", "現在簡單式 Present Simple", "weeks"],
+["Unit 8", "blanket", "", "noun", "A soft, warm cover for a bed.", "I pulled the blanket over my head and went to sleep.", "我把毯子拉到頭上就睡著了。", "過去簡單式 Past Simple", "blankets"],
+["Unit 8", "boring", "", "adjective", "Not interesting.", "The movie was so boring that I fell asleep.", "這部電影太無聊了，我看到睡著。", "過去簡單式 Past Simple", ""],
+["Unit 8", "drive", "", "verb", "To control a car or a bus and make it go.", "My dad drove us to the lake last weekend.", "我爸爸上週末開車載我們去湖邊。", "過去簡單式 Past Simple", ""],
+["Unit 8", "exciting", "", "adjective", "Making you feel happy and full of energy.", "What an exciting game it was!", "這是多麼刺激的一場比賽啊！", "感嘆句 Exclamation", ""],
+["Unit 8", "frightened", "", "adjective", "Feeling afraid.", "Do not be frightened, it is only the wind!", "不要害怕，那只是風聲！", "否定祈使句 Do not ...", ""],
+["Unit 8", "island", "", "noun", "A piece of land with water all around it.", "We are going to sail to a small island tomorrow.", "明天我們要航行到一座小島。", "未來式 be going to", "islands"],
+["Unit 8", "quick", "", "adjective", "Fast. Taking only a short time.", "Be quick, or we will miss the bus!", "快一點，不然我們會錯過公車！", "祈使句 Imperative + 未來式 will", ""],
+["Unit 8", "sail", "", "verb", "To travel on water in a boat.", "They have sailed around the island three times.", "他們已經繞著小島航行三圈了。", "現在完成式 Present Perfect", ""],
+["Unit 8", "skate", "", "noun, verb", "(verb) To move on ice or on wheels wearing special shoes. (noun) A special shoe for skating.", "Can you skate backwards?", "你會倒著溜冰嗎？", "疑問句・情態動詞 can / must / should", "skates"],
+["Unit 8", "towel", "", "noun", "A piece of cloth that you use to dry your body.", "Do not forget your towel when you go swimming.", "去游泳時不要忘了帶毛巾。", "否定祈使句 Do not ...", "towels"],
+["Unit 9", "forest", "", "noun", "A large area with many trees.", "We walked through the forest and heard a strange noise.", "我們走過森林時，聽到一個奇怪的聲音。", "過去簡單式 Past Simple", "forests"],
+["Unit 9", "invite", "", "verb", "To ask someone to come to a party or an event.", "I am going to invite my whole class to my birthday party.", "我打算邀請全班來參加我的生日派對。", "未來式 be going to", ""],
+["Unit 9", "lake", "", "noun", "A large area of water with land all around it.", "Look! There are two ducks on the lake!", "看！湖上有兩隻鴨子！", "祈使句 Imperative", "lakes"],
+["Unit 9", "mountain", "", "noun", "A very high hill.", "Have you ever climbed a mountain?", "你有爬過山嗎？", "疑問句・現在完成式 Present Perfect", "mountains"],
+["Unit 9", "picnic", "", "noun", "A meal that you eat outside, often in a park.", "What should we bring to the picnic?", "我們野餐應該帶什麼？", "疑問句・情態動詞 can / must / should", "picnics"],
+["Unit 10", "cloud", "", "noun", "A white or gray shape in the sky that is made of tiny drops of water.", "Look at that cloud! It looks like a dragon.", "看那朵雲！它看起來像一條龍。", "祈使句 Imperative + 現在簡單式 Present Simple", "clouds"],
+["Unit 10", "cloudy", "", "adjective", "Full of clouds.", "It is cloudy now, but it may be sunny later.", "現在是陰天，但待會兒可能會放晴。", "現在簡單式 Present Simple + may", ""],
+["Unit 10", "rain", "", "noun, verb", "(noun) Water that falls from the sky. (verb) When water falls from the sky.", "It rained all day yesterday, so we stayed inside.", "昨天下了一整天的雨，所以我們都待在屋裡。", "過去簡單式 Past Simple", "-"],
+["Unit 10", "rainbow", "", "noun", "A curved line of many colors in the sky after rain.", "I have never seen a double rainbow before.", "我以前從來沒看過雙彩虹。", "現在完成式 Present Perfect", "rainbows"],
+["Unit 10", "sky", "", "noun", "The space above the Earth where you see the sun, the moon, and the stars.", "The sky turned pink when the sun went down.", "太陽下山時，天空變成了粉紅色。", "過去簡單式 Past Simple", "skies"],
+["Unit 10", "snow", "", "noun, verb", "(noun) Soft white pieces of frozen water that fall from the sky. (verb) When snow falls.", "Let us build a big snowman if it snows tomorrow!", "如果明天下雪，我們就來堆一個大雪人吧！", "條件句 If ... will", "-"],
+["Unit 10", "wind", "", "noun", "Air that moves fast.", "The wind blew my hat into the river!", "風把我的帽子吹進河裡了！", "過去簡單式 Past Simple", "=通常不可數；winds 指不同的風（如 strong winds 強風）"],
+["Unit 10", "windy", "", "adjective", "With a lot of wind.", "It is too windy to fly a kite today.", "今天風太大，不能放風箏。", "現在簡單式 Present Simple（too ... to）", ""],
+["Unit 11", "afraid (of)", "afraid of", "adjective", "Feeling scared of something.", "Are you afraid of spiders?", "你怕蜘蛛嗎？", "疑問句・現在簡單式 Present Simple", ""],
+["Unit 11", "countryside", "", "noun", "Land outside towns and cities, with farms and fields.", "I like riding my bike in the countryside.", "我喜歡在鄉下騎腳踏車。", "現在簡單式 Present Simple", "-"],
+["Unit 11", "cup", "", "noun", "A small round container for drinking from.", "Can I have a cup of hot chocolate, please?", "請問我可以要一杯熱可可嗎？", "禮貌請求 Polite Request", "cups"],
+["Unit 11", "dolphin", "", "noun", "A smart sea animal that jumps out of the water.", "The dolphin jumped out of the water and splashed us!", "海豚跳出水面，把水濺到我們身上！", "過去簡單式 Past Simple", "dolphins"],
+["Unit 11", "hide", "", "verb", "To go where no one can see you, or to put something where no one can find it.", "Where did you hide my chocolate?", "你把我的巧克力藏到哪裡去了？", "疑問句・過去簡單式 Past Simple", ""],
+["Unit 11", "hop", "", "verb", "To jump with small jumps, like a rabbit.", "Can you hop on one foot for ten seconds?", "你可以用一隻腳跳十秒嗎？", "疑問句・情態動詞 can / must / should", ""],
+["Unit 11", "hungry", "", "adjective", "Wanting to eat.", "I am so hungry that I could eat a whole pizza!", "我餓到可以吞下一整個披薩！", "感嘆句 Exclamation", ""],
+["Unit 11", "jungle", "", "noun", "A thick forest in a hot country with many wild animals and plants.", "Monkeys swing from tree to tree in the jungle.", "猴子在叢林裡從一棵樹盪到另一棵樹。", "現在簡單式 Present Simple", "jungles"],
+["Unit 11", "rabbit", "", "noun", "A small animal with long ears. It hops and eats plants.", "Two white rabbits were hopping in the garden.", "兩隻白兔當時正在花園裡跳來跳去。", "過去進行式 Past Continuous", "rabbits"],
+["Unit 11", "shark", "", "noun", "A big fish with sharp teeth.", "The shark is swimming toward the boat!", "鯊魚正朝著小船游過來！", "現在進行式 Present Continuous", "sharks"],
+["Unit 11", "slow", "", "adjective", "Not fast.", "Turtles are slow, but they never give up.", "烏龜很慢，但牠們從不放棄。", "現在簡單式 Present Simple", ""],
+["Unit 11", "snail", "", "noun", "A small animal with a soft body and a shell on its back.", "I found a snail on a wet leaf this morning.", "我今天早上在濕濕的葉子上發現一隻蝸牛。", "過去簡單式 Past Simple", "snails"],
+["Unit 11", "strong", "", "adjective", "Having a lot of power. Able to lift heavy things.", "Who is the strongest person in your family?", "你家裡誰最強壯？", "疑問句・最高級 Superlative", ""],
+["Unit 11", "tea", "", "noun", "A hot drink made from dried leaves.", "Would you like some tea or some juice?", "你想喝茶還是果汁？", "禮貌請求 Polite Request", "=通常不可數；點飲料時可說 two teas（兩杯茶）"],
+["Unit 11", "thirsty", "", "adjective", "Wanting to drink.", "I am thirsty. Can I have some water, please?", "我口渴了，請問我可以喝點水嗎？", "現在簡單式 Present Simple + 禮貌請求 Polite Request", ""],
+["Unit 11", "waterfall", "", "noun", "A place where water falls down from a high place.", "We took a photo in front of the waterfall.", "我們在瀑布前拍了照片。", "過去簡單式 Past Simple", "waterfalls"],
+["Unit 11", "whale", "", "noun", "A very large animal that lives in the sea.", "Whales are the biggest animals in the sea.", "鯨魚是海裡最大的動物。", "現在簡單式 Present Simple + 最高級 Superlative", "whales"],
+["Unit 12", "climb", "", "verb", "To go up something, such as a tree, a wall, or a mountain.", "I am climbing the rope as fast as I can.", "我正用最快的速度爬繩子。", "現在進行式 Present Continuous", ""],
+["Unit 12", "goal", "", "noun", "(1) The place where you try to put the ball in a game. (2) Something you really want to do or get.", "My goal this year is to read twenty books.", "我今年的目標是讀二十本書。", "現在簡單式 Present Simple", "goals"],
+["Unit 12", "kangaroo", "", "noun", "An animal from Australia that hops and carries its baby in a pocket on its stomach.", "The kangaroo hopped away when we came near.", "我們一靠近，袋鼠就跳走了。", "過去簡單式 Past Simple", "kangaroos"],
+["Unit 12", "net", "", "noun", "A material made of crossed strings with spaces between them, used in sports or for catching things.", "The ball flew into the net, and everyone cheered!", "球飛進網裡，大家都歡呼起來！", "過去簡單式 Past Simple", "nets"],
+["Unit 12", "score", "", "verb", "To win a point in a game.", "How many points did you score in the game?", "你在比賽中得了幾分？", "疑問句・過去簡單式 Past Simple", ""],
+["Unit 12", "square", "", "adjective, noun", "(noun) A shape with four equal sides. (adjective) Shaped like a square.", "Draw a square, and then draw a circle inside it.", "畫一個正方形，然後在裡面畫一個圓。", "祈使句 Imperative", "squares"]
+];
+function stableId(unit,word){let h=5381;const t=unit+'|'+String(word).toLowerCase();for(let i=0;i<t.length;i++)h=((h<<5)+h+t.charCodeAt(i))>>>0;return 100000+(h%8000000)}
+const BUILTIN=BUILTIN_RAW.map(r=>({id:(r[0]==='Unit 1'&&r[1]==='Beard')?1:stableId(r[0],r[1]),unit:r[0],word:r[1],say:r[2],pos:r[3],definition:r[4],sentenceEn:r[5],sentenceZh:r[6],tense:r[7],plural:r[8],audioUrl:'',builtin:true}));
+function isLegacySample(x){return !!x&&x.id===2&&x.unit==='Unit 1'&&normalizeWord(x.word)==='bottle'}
 const $=id=>document.getElementById(id);
 const NS='http://www.w3.org/2000/svg';
 const state={student:'Eason',unit:'Unit 1',editingId:null,wordList:[],history:{Eason:{},yangyang:{},TestPortal:{}},audio:{},speech:null,rec:null};
@@ -170,24 +312,31 @@ const reduceMotion=!!(window.matchMedia&&matchMedia('(prefers-reduced-motion: re
 function storageGet(key,fallback){try{const v=localStorage.getItem(key);return v===null?fallback:JSON.parse(v)}catch(e){notify('無法讀取瀏覽器資料：'+e.message,true);return fallback}}
 function storageSet(key,value){try{localStorage.setItem(key,JSON.stringify(value));lastStorageError='';return true}catch(e){lastStorageError=(e&&e.name==='QuotaExceededError')?'瀏覽器儲存空間已滿，請先下載備份並清理資料。':'瀏覽器不允許儲存資料（'+((e&&e.name)||'未知錯誤')+'）。若是在預覽視窗、無痕模式或內嵌頁面開啟，請改用 Chrome 直接開啟檔案或網站網址。';notify('儲存失敗：'+lastStorageError,true);return false}}
 function notify(msg,error=false){$('status').textContent=(error?'⚠️ ':'✓ ')+msg}
+function persistWords(list){return storageSet(KEY,list.filter(x=>!x.builtin))}
 
 /* ---------- 資料處理 ---------- */
 function normalizeWord(s){return String(s||'').trim().replace(/\s+/g,' ').toLowerCase()}
 function validWord(w){return /^[A-Za-zÀ-ÿ][A-Za-zÀ-ÿ0-9\s'’.\/-]*$/.test(w)}
 function simpleSentence(word,pos){const w=String(word||'').trim().toLowerCase();const p=String(pos||'').toLowerCase();if(!w)return '';if(/\bnoun\b/.test(p))return `I see the ${w}.`;if(/\bverb\b/.test(p))return `They ${w}.`;if(/\badjective\b/.test(p))return `It is ${w}.`;return ''}
-function normalizeItem(raw){if(!raw||!raw.word||!UNITS.includes(raw.unit))return null;return {id:Number(raw.id)||Date.now()+Math.floor(Math.random()*100000),unit:raw.unit,word:String(raw.word).trim(),pos:String(raw.pos||''),definition:String(raw.definition||''),sentenceEn:String(raw.sentenceEn||''),sentenceZh:String(raw.sentenceZh||''),audioUrl:String(raw.audioUrl||'')}}
-function dedup(items){const m=new Map();for(const r of items){const it=normalizeItem(r);if(!it)continue;const k=it.unit+'|'+normalizeWord(it.word);if(!m.has(k)){m.set(k,it)}else{const prev=m.get(k);for(const f of ['pos','definition','sentenceEn','sentenceZh','audioUrl'])if(!prev[f]&&it[f])prev[f]=it[f]}}const out=[...m.values()],seen=new Set();for(const it of out){while(seen.has(it.id))it.id+=1;seen.add(it.id)}return out}
+const IRREG_PLURAL={man:'men',woman:'women',child:'children',foot:'feet',tooth:'teeth',mouse:'mice',person:'people',leaf:'leaves',life:'lives',wife:'wives',knife:'knives',wolf:'wolves',shelf:'shelves',goose:'geese',fish:'fish',sheep:'sheep',stomach:'stomachs',monarch:'monarchs'};
+function pluralize(word){const w=String(word||'').trim().toLowerCase();if(!w)return '';const parts=w.split(' ');const last=parts.pop();let p;if(IRREG_PLURAL[last])p=IRREG_PLURAL[last];else if(/(s|x|z|ch|sh)$/.test(last))p=last+'es';else if(/[^aeiou]y$/.test(last))p=last.slice(0,-1)+'ies';else if(['potato','tomato','hero','echo'].includes(last))p=last+'es';else p=last+'s';return [...parts,p].join(' ')}
+function pluralLabel(p){p=String(p||'').trim();if(!p)return '';if(p==='-')return '不可數名詞（沒有複數形）';if(p[0]==='=')return p.slice(1);return '名詞複數：'+p}
+function normalizeItem(raw){if(!raw||!raw.word||!UNITS.includes(raw.unit))return null;return {id:Number(raw.id)||Date.now()+Math.floor(Math.random()*100000),unit:raw.unit,word:String(raw.word).trim(),pos:String(raw.pos||''),definition:String(raw.definition||''),sentenceEn:String(raw.sentenceEn||''),sentenceZh:String(raw.sentenceZh||''),audioUrl:String(raw.audioUrl||''),say:String(raw.say||''),tense:String(raw.tense||''),plural:String(raw.plural||''),builtin:!!raw.builtin}}
+function dedup(items){const m=new Map();for(const r of items){const it=normalizeItem(r);if(!it)continue;const k=it.unit+'|'+normalizeWord(it.word);if(!m.has(k)){m.set(k,it)}else{const prev=m.get(k);for(const f of ['pos','definition','sentenceEn','sentenceZh','audioUrl','say','tense','plural'])if(!prev[f]&&it[f])prev[f]=it[f]}}const out=[...m.values()],seen=new Set();for(const it of out){while(seen.has(it.id))it.id+=1;seen.add(it.id)}return out}
 function displayName(st){return st==='yangyang'?'Yangyang':st==='TestPortal'?'老師測試':st}
 
 /* ---------- 發音分數 ---------- */
-function cleanText(s){return String(s).toLowerCase().replace(/[^a-z0-9\s']/g,'').replace(/\s+/g,' ').trim()}
+const ONES=['zero','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen'],TENS=['','','twenty','thirty','forty','fifty','sixty','seventy','eighty','ninety'];
+function numWords(n){if(n<20)return ONES[n];if(n<100)return TENS[Math.floor(n/10)]+(n%10?' '+ONES[n%10]:'');return String(n)}
+function cleanText(s){return String(s).normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[-–]/g,' ').replace(/\b\d{1,2}\b/g,m=>numWords(+m)).replace(/[^a-z0-9\s']/g,'').replace(/\s+/g,' ').trim()}
 function lev(a,b){const m=a.length,n=b.length;if(!m)return n;if(!n)return m;let prev=Array.from({length:n+1},(_,j)=>j);for(let i=1;i<=m;i++){const cur=[i];for(let j=1;j<=n;j++)cur[j]=Math.min(prev[j]+1,cur[j-1]+1,prev[j-1]+(a[i-1]===b[j-1]?0:1));prev=cur}return prev[n]}
 function similarity(heard,target){const h=cleanText(heard),t=cleanText(target);if(!t)return 0;const chars=1-lev(h,t)/Math.max(h.length,t.length,1);const hw=h?h.split(' '):[],tw=t.split(' ');if(tw.length<2)return Math.max(0,chars);const words=1-lev(hw,tw)/Math.max(hw.length,tw.length,1);return Math.max(0,.6*words+.4*chars)}
 function pronScore(heard,target,conf){const sim=similarity(heard,target);const factor=conf>0?.7+.3*conf:.9;return Math.round(Math.min(1,sim*factor)*100)}
 function feedback(score){return score>=90?'🌟 咒語完美！':score>=80?'🪄 施法成功！':score>=60?'🌙 快成功了，再試一次！':'📖 先聽一次示範，再練習看看。'}
 function entriesFor(key){return ((state.history[state.student]||{})[state.student+'_'+key])||[]}
 function scoredEntries(key){return entriesFor(key).filter(x=>typeof x.score==='number')}
-function entryPoints(x){return typeof x.score==='number'?(x.score>=80?10:x.score>=60?5:0):0}
+function pointsFor(score){return score>=90?10:score>=80?5:score>=60?2:0}
+function entryPoints(x){return typeof x.score==='number'?pointsFor(x.score):0}
 function pointsByUnit(student){const out={};const h=state.history[student]||{};for(const it of state.wordList){let t=0;for(const k of ['word_'+it.id,'sent_'+it.id])for(const x of (h[student+'_'+k]||[]))t+=entryPoints(x);out[it.unit]=(out[it.unit]||0)+t}return out}
 
 /* ---------- 圖表 ---------- */
@@ -211,12 +360,12 @@ function renderSpark(el){const list=scoredEntries(el.dataset.key);const name=el.
 function makeSpark(key,kind){const el=make('div','spark');el.dataset.key=key;el.dataset.kind=kind;renderSpark(el);return el}
 function refreshSparks(){document.querySelectorAll('.spark').forEach(el=>renderSpark(el))}
 function renderSpeechChart(){if(!state.speech)return;const list=scoredEntries(state.speech.key);$('speechChartTitle').textContent=(state.speech.kind==='word'?'🔊 單字發音分數曲線':'📖 句子發音分數曲線')+`（${displayName(state.student)}）`;const host=$('speechChart');host.replaceChildren();if(!list.length){host.append(make('p','small','還沒有分數紀錄，錄音後就會畫出曲線。'));return}host.append(scoreChart(list,false))}
-function renderPoints(){const pu=pointsByUnit(state.student),total=Object.values(pu).reduce((a,b)=>a+b,0);const p=$('points');p.replaceChildren();p.append(document.createTextNode(`✨ ${displayName(state.student)} 的 ${state.unit} 魔法點數：${pu[state.unit]||0}　`),make('small','',`（所有單元合計 ${total}；單次發音 80 分以上 +10、60–79 分 +5）`))}
+function renderPoints(){const pu=pointsByUnit(state.student),total=Object.values(pu).reduce((a,b)=>a+b,0);const p=$('points');p.replaceChildren();p.append(document.createTextNode(`✨ ${displayName(state.student)} 的 ${state.unit} 魔法點數：${pu[state.unit]||0}　`),make('small','',`（所有單元合計 ${total}；單次發音 90 分以上 +10、80–89 分 +5、60–79 分 +2）`))}
 
 /* ---------- 畫面 ---------- */
 function make(tag,cls,txt){const e=document.createElement(tag);if(cls)e.className=cls;if(txt!==undefined)e.textContent=txt;return e}
 function action(text,fn,cls=''){const b=make('button',cls,text);b.addEventListener('click',fn);return b}
-function init(){const saved=storageGet(KEY,null);state.wordList=dedup(Array.isArray(saved)?saved:DEFAULT);const h=storageGet(HISTORY_KEY,null);if(h&&typeof h==='object')for(const st of Object.keys(state.history))state.history[st]=h[st]||{};for(const st of Object.keys(h||{}))if(!state.history[st])state.history[st]=h[st];state.audio=storageGet(AUDIO_KEY,{})||{};const count=Array.isArray(saved)?saved.length-state.wordList.length:0;if(count>0)notify(`讀取時發現 ${count} 筆重複單字，已在顯示中合併。請先下載備份，再儲存新資料。`);if('speechSynthesis'in window){speechSynthesis.getVoices();speechSynthesis.addEventListener('voiceschanged',()=>speechSynthesis.getVoices())}initSky();render();bind()}
+function init(){const saved=storageGet(KEY,null);const custom=(Array.isArray(saved)?saved:[]).filter(x=>!isLegacySample(x));state.wordList=dedup([...BUILTIN,...custom]);const h=storageGet(HISTORY_KEY,null);if(h&&typeof h==='object')for(const st of Object.keys(state.history))state.history[st]=h[st]||{};for(const st of Object.keys(h||{}))if(!state.history[st])state.history[st]=h[st];state.audio=storageGet(AUDIO_KEY,{})||{};const count=custom.length-dedup(custom).length;if(count>0)notify(`讀取時發現 ${count} 筆重複單字，已在顯示中合併。請先下載備份，再儲存新資料。`);if('speechSynthesis'in window){speechSynthesis.getVoices();speechSynthesis.addEventListener('voiceschanged',()=>speechSynthesis.getVoices())}initSky();render();bind()}
 function render(){renderTabs();renderCards();renderTeacherList();renderPoints();$('pageTitle').textContent=state.student==='TestPortal'?'🧪 老師測試入口':`✨ ${displayName(state.student)} 的魔法單字`}
 function renderTabs(){document.querySelectorAll('[data-student]').forEach(b=>{b.classList.toggle('active',b.dataset.student===state.student)});$('unitButtons').replaceChildren();const pu=pointsByUnit(state.student);for(const u of UNITS){const b=document.createElement('button');b.textContent=`${u} (${state.wordList.filter(w=>w.unit===u).length})`+(pu[u]?` ✨${pu[u]}`:'');b.classList.toggle('active',u===state.unit);b.addEventListener('click',()=>{state.unit=u;render()});$('unitButtons').append(b)}}
 function renderCards(){const host=$('cards');host.replaceChildren();const words=state.wordList.filter(w=>w.unit===state.unit);if(!words.length){host.append(make('div','empty','這個單元目前沒有單字。'));return}
@@ -225,12 +374,12 @@ const card=make('article','card'),inner=make('div','card-inner'),front=make('div
 back.inert=true;back.setAttribute('aria-hidden','true');
 const flip=()=>{const f=card.classList.toggle('flipped');front.inert=f;back.inert=!f;front.setAttribute('aria-hidden',String(f));back.setAttribute('aria-hidden',String(!f))};
 const frontActions=make('div','actions');
-const wordAudio=()=>item.audioUrl||state.audio[normalizeWord(item.word)]||'';
-frontActions.append(action('🔊 單字・正常',()=>playAudio(item.word,wordAudio(),SPEED.normal)),action('🐢 單字・慢速',()=>playAudio(item.word,wordAudio(),SPEED.slow)),action('🎤 練習單字',()=>openSpeech(item.word,'word_'+item.id,wordAudio())),action('🔄 看例句',flip,'red'));
-front.append(make('span','seal','✦'),make('span','small',item.unit),make('h3','',item.word),make('div','pos',item.pos||'詞性尚未填寫'),make('p','definition grow',item.definition||'英文定義尚未填寫'),makeSpark('word_'+item.id,'word'),frontActions);
+const wordAudio=()=>item.audioUrl||state.audio[normalizeWord(item.word)]||'';const sayWord=item.say||item.word;
+frontActions.append(action('🔊 單字・正常',()=>playAudio(sayWord,wordAudio(),SPEED.normal)),action('🐢 單字・慢速',()=>playAudio(sayWord,wordAudio(),SPEED.slow)),action('🎤 練習單字',()=>openSpeech(sayWord,'word_'+item.id,wordAudio())),action('🔄 看例句',flip,'red'));
+front.append(make('span','seal','✦'),make('span','small',item.unit),make('h3','',item.word),make('div','pos',item.pos||'詞性尚未填寫'),...(pluralLabel(item.plural)?[make('div','plural',pluralLabel(item.plural))]:[]),make('p','definition grow',item.definition||'英文定義尚未填寫'),makeSpark('word_'+item.id,'word'),frontActions);
 const backActions=make('div','actions');
 backActions.append(action('🔊 例句・正常',()=>playAudio(item.sentenceEn,'',SPEED.normal)),action('🐢 例句・慢速',()=>playAudio(item.sentenceEn,'',SPEED.slow)),action('🎤 練習例句',()=>openSpeech(item.sentenceEn,'sent_'+item.id)),action('🔄 回到單字',flip,'red'));
-back.append(make('span','seal','✦'),make('div','small','Example Sentence'),make('p','example',item.sentenceEn||'目前沒有例句'),make('p','small grow',item.sentenceZh||''),makeSpark('sent_'+item.id,'sentence'),backActions);
+back.append(make('span','seal','✦'),make('div','small','Example Sentence'),make('p','example',item.sentenceEn||'目前沒有例句'),...(item.tense?[make('div','tense','🕒 '+item.tense)]:[]),make('p','small grow',item.sentenceZh||''),makeSpark('sent_'+item.id,'sentence'),backActions);
 inner.append(front,back);card.append(inner);host.append(card)}}
 
 /* ---------- 語音播放 ---------- */
@@ -246,15 +395,14 @@ ttsUtter=u;let started=false;   // 保留參考，避免 Chrome 提早回收而�
 u.onstart=()=>{started=true};
 u.onerror=ev=>{if(ev.error==='canceled'||ev.error==='interrupted')return;if(attempt===0){speakTTS(text,1,rate);return}notify('語音播放失敗（'+ev.error+'）。請檢查裝置音量與靜音開關，或到系統設定安裝 English (US) 語音。',true)};
 setTimeout(()=>{try{synth.speak(u)}catch(e){notify('無法播放語音：'+e.message,true)}},60);
-setTimeout(()=>{if(started||ttsUtter!==u)return;if(attempt===0){try{synth.cancel()}catch(e){}speakTTS(text,1,rate)}else notify('沒有聽到聲音？請檢查裝置音量、靜音開關，或按「🔈 測試聲音」查看偵測到的語音。',true)},2500)}
-function testSound(){if(!('speechSynthesis'in window)){notify('此瀏覽器不支援語音播放，請改用 Chrome、Edge 或 Safari。',true);return}const vs=speechSynthesis.getVoices();const v=pickVoice();speakTTS('Hello! Welcome to the magic English hub.');notify(`偵測到 ${vs.length} 個語音，使用：${v?v.name+'（'+v.lang+'）':'瀏覽器預設語音'}。如果仍然沒有聲音，請檢查裝置音量與靜音開關。`)}
+setTimeout(()=>{if(started||ttsUtter!==u)return;if(attempt===0){try{synth.cancel()}catch(e){}speakTTS(text,1,rate)}else notify('沒有聽到聲音？請檢查裝置音量與靜音開關，或到系統設定確認已安裝 English (US) 語音。',true)},2500)}
 
 /* ---------- 口說練習 ---------- */
 function openSpeech(text,key,audioUrl=''){if(!text)return;state.speech={text,key,audioUrl,kind:key.startsWith('word_')?'word':'sentence'};$('speechTarget').textContent='請朗讀：'+text;$('speechResult').textContent='點選「開始錄音」進行辨識。';$('speechHistoryContent').textContent='';renderSpeechChart();$('speechRetry').textContent='🎙️ 開始錄音';$('speechDialog').showModal()}
 function startSpeech(){const S=window.SpeechRecognition||window.webkitSpeechRecognition;if(!S){$('speechResult').textContent='這個瀏覽器不支援語音辨識，建議使用最新版 Chrome。';return}if(state.rec)return;if('speechSynthesis'in window)speechSynthesis.cancel();
 const r=new S();state.rec=r;let got=false,failed=false;$('speechRetry').disabled=true;r.lang='en-US';r.interimResults=false;r.maxAlternatives=1;$('speechResult').textContent='🎙️ 正在聆聽…';
 r.onresult=e=>{got=true;const alt=e.results[0][0],heard=alt.transcript,conf=typeof alt.confidence==='number'?alt.confidence:0;
-const ok=cleanText(heard)===cleanText(state.speech.text),score=pronScore(heard,state.speech.text,conf),pts=score>=80?10:score>=60?5:0;
+const ok=cleanText(heard)===cleanText(state.speech.text),score=pronScore(heard,state.speech.text,conf),pts=pointsFor(score);
 $('speechResult').textContent=`辨識結果：${heard}\n發音分數：${score} 分（估算）${ok?'，文字完全相符':''}　${feedback(score)}`+(pts?`\n✨ 獲得 ${pts} 魔法點數（${state.unit}）`:'');
 const id=state.student+'_'+state.speech.key,h=state.history[state.student]||(state.history[state.student]={}),list=h[id]||(h[id]=[]);
 list.push({time:new Date().toISOString(),recognized:heard,matched:ok,score,confidence:Math.round(conf*100)/100});if(list.length>200)list.splice(0,list.length-200);
@@ -266,7 +414,7 @@ try{r.start()}catch(e){state.rec=null;$('speechRetry').disabled=false;$('speechR
 function showSpeechHistory(){if(!state.speech)return;const list=entriesFor(state.speech.key);$('speechHistoryContent').textContent=list.length?`共 ${list.length} 次辨識，其中 ${list.filter(x=>x.matched).length} 次文字完全相符。\n最近紀錄：\n`+list.slice(-8).map(x=>`${new Date(x.time).toLocaleString('zh-TW')}｜${typeof x.score==='number'?x.score+' 分':(x.matched?'相符':'不同')}｜${x.recognized}`).join('\n'):'尚無練習紀錄'}
 
 /* ---------- 教師管理：編輯單字 ---------- */
-function resetEdit(){state.editingId=null;for(const id of ['editWord','editPos','editDefinition','editSentence','editZh'])$(id).value='';$('editHint').textContent='';$('lookupStatus').textContent='';$('saveMsg').textContent='';$('saveWord').textContent='💾 確認並儲存';$('editUnit').value=state.unit}
+function resetEdit(){state.editingId=null;for(const id of ['editWord','editPos','editPlural','editDefinition','editSentence','editZh'])$(id).value='';$('editHint').textContent='';$('lookupStatus').textContent='';$('saveMsg').textContent='';$('saveWord').textContent='💾 確認並儲存';$('editUnit').value=state.unit}
 function setLookupMessage(s,ok=false){$('lookupStatus').textContent=(ok?'✓ ':'⚠️ ')+s}
 function bestExample(entry){for(const m of entry.meanings||[]){for(const d of m.definitions||[]){if(typeof d.example==='string'&&d.example.trim())return {pos:m.partOfSpeech||'',definition:d.definition||'',example:d.example}}}return null}
 function bestDefinition(entry){for(const m of entry.meanings||[]){for(const d of m.definitions||[]){if(d.definition)return {pos:m.partOfSpeech||'',definition:d.definition,example:''}}}return null}
@@ -275,7 +423,7 @@ async function lookupDictionary(){const word=$('editWord').value.trim();if(!vali
 try{const ctrl=new AbortController();const timer=setTimeout(()=>ctrl.abort(),9000);let response;try{response=await fetch('https://api.dictionaryapi.dev/api/v2/entries/en/'+encodeURIComponent(word.toLowerCase()),{signal:ctrl.signal})}finally{clearTimeout(timer)}
 if(!response.ok)throw new Error(response.status===404?'字典沒有收錄這個字':'HTTP '+response.status);
 const data=await response.json();const entry=data.find(x=>normalizeWord(x.word)===normalizeWord(word))||data[0];const d=bestExample(entry)||bestDefinition(entry);if(!d)throw new Error('字典沒有提供可用的定義');
-$('editPos').value=d.pos;$('editDefinition').value=d.definition;
+$('editPos').value=d.pos;$('editPlural').value=/\bnoun\b/i.test(d.pos)?pluralize(word):'';$('editDefinition').value=d.definition;
 let sentence=d.example,auto=false;if(!sentence){sentence=simpleSentence(word,d.pos);auto=!!sentence}
 $('editSentence').value=sentence;$('editZh').value='';
 const a=audioFromEntry(entry);state.audio[normalizeWord(word)]=a;const am=a?' 已找到發音錄音。':' 未找到錄音，將使用美式語音備援。';
@@ -288,19 +436,20 @@ if(!validWord(word)){showSaveMsg('單字只能包含英文字母、數字、空�
 if(!UNITS.includes(unit)){showSaveMsg('請選擇單元。');return}
 if(!definition){showSaveMsg('請填寫英文定義（可先按「查詢字典」自動帶入）。');$('editDefinition').focus();return}
 if(!sentence){const auto=simpleSentence(word,pos);if(auto){$('editSentence').value=auto;showSaveMsg('例句是空的，已自動產生簡單例句，請確認後再按一次「確認並儲存」。')}else showSaveMsg('請填寫英文例句（此詞性不適合自動造句）。');$('editSentence').focus();return}
-const duplicate=state.wordList.find(x=>x.unit===unit&&normalizeWord(x.word)===normalizeWord(word)&&x.id!==state.editingId);if(duplicate){showSaveMsg(`${unit} 已有「${word}」，請改用下方「現有單字」的編輯功能。`);return}
+const duplicate=state.wordList.find(x=>x.unit===unit&&normalizeWord(x.word)===normalizeWord(word)&&x.id!==state.editingId);if(duplicate){showSaveMsg(duplicate.builtin?`${unit} 已經有內建單字「${duplicate.word}」，不需要重複新增。`:`${unit} 已有「${word}」，請改用下方「現有單字」的編輯功能。`);return}
 let id=state.editingId;if(!id){id=Date.now();while(state.wordList.some(x=>x.id===id))id++}
-const item={id,unit,word,pos,definition,sentenceEn:sentence,sentenceZh:$('editZh').value.trim(),audioUrl:state.audio[normalizeWord(word)]||''};
+let plural=$('editPlural').value.trim(),autoPl=false;if(!plural&&/\bnoun\b/i.test(pos)){plural=pluralize(word);autoPl=!!plural}
+const item={id,unit,word,pos,plural,definition,sentenceEn:sentence,sentenceZh:$('editZh').value.trim(),audioUrl:state.audio[normalizeWord(word)]||''};
 const next=state.editingId?state.wordList.map(x=>x.id===state.editingId?item:x):[...state.wordList,item];
-if(!storageSet(KEY,next)){showSaveMsg('儲存失敗，資料未加入。'+lastStorageError);return}
-state.wordList=next;storageSet(AUDIO_KEY,state.audio);state.unit=unit;render();resetEdit();showSaveMsg(`已儲存「${word}」至 ${unit}。請記得定期下載備份。`,true);notify(`已儲存「${word}」至 ${unit}`)}
-function renderTeacherList(){const host=$('teacherList');host.replaceChildren();for(const it of state.wordList){const row=make('div','teacher-row');const label=make('span','');label.append(make('strong','',it.word),make('span','small',`　${it.unit} · ${it.pos||'未填詞性'}`));const actions=make('div','teacher-actions');
-actions.append(action('編輯',()=>{state.editingId=it.id;$('editUnit').value=it.unit;$('editWord').value=it.word;$('editPos').value=it.pos;$('editDefinition').value=it.definition;$('editSentence').value=it.sentenceEn;$('editZh').value=it.sentenceZh;$('saveWord').textContent='💾 儲存修改';$('editHint').textContent='正在編輯：'+it.word;$('lookupStatus').textContent='';$('saveMsg').textContent='';$('editWord').focus()}),
-action('刪除',()=>{if(!confirm(`確定刪除 ${it.unit} 的「${it.word}」嗎？`))return;const next=state.wordList.filter(x=>x.id!==it.id);if(storageSet(KEY,next)){state.wordList=next;render();notify('已刪除 '+it.word)}}));row.append(label,actions);host.append(row)}}
+if(!persistWords(next)){showSaveMsg('儲存失敗，資料未加入。'+lastStorageError);return}
+state.wordList=next;storageSet(AUDIO_KEY,state.audio);state.unit=unit;render();resetEdit();showSaveMsg(`已儲存「${word}」至 ${unit}。`+(autoPl?`名詞複數已自動帶入為「${plural}」，若不對請到「現有單字」編輯。`:'')+'請記得定期下載備份。',true);notify(`已儲存「${word}」至 ${unit}`)}
+function renderTeacherList(){const host=$('teacherList');host.replaceChildren();for(const it of state.wordList){const row=make('div','teacher-row');const label=make('span','');label.append(make('strong','',it.word),make('span','small',`　${it.unit} · ${it.pos||'未填詞性'}`));if(it.builtin){row.append(label,make('span','small','📌 內建單字'));host.append(row);continue}const actions=make('div','teacher-actions');
+actions.append(action('編輯',()=>{state.editingId=it.id;$('editUnit').value=it.unit;$('editWord').value=it.word;$('editPos').value=it.pos;$('editDefinition').value=it.definition;$('editSentence').value=it.sentenceEn;$('editZh').value=it.sentenceZh;$('editPlural').value=it.plural||'';$('saveWord').textContent='💾 儲存修改';$('editHint').textContent='正在編輯：'+it.word;$('lookupStatus').textContent='';$('saveMsg').textContent='';$('editWord').focus()}),
+action('刪除',()=>{if(!confirm(`確定刪除 ${it.unit} 的「${it.word}」嗎？`))return;const next=state.wordList.filter(x=>x.id!==it.id);if(persistWords(next)){state.wordList=next;render();notify('已刪除 '+it.word)}}));row.append(label,actions);host.append(row)}}
 
 /* ---------- 備份與還原 ---------- */
-function exportData(){const data={format:'hogwarts-english-backup',version:12,exportedAt:new Date().toISOString(),vocabulary:state.wordList,history:state.history};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='magic-english-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}
-async function importData(file){if(!file)return;try{const obj=JSON.parse(await file.text());if(obj.format!=='hogwarts-english-backup'||!Array.isArray(obj.vocabulary))throw new Error('不是此網站產生的備份檔');const incoming=dedup(obj.vocabulary);if(!incoming.length)throw new Error('備份中沒有有效單字');if(!confirm(`要匯入 ${incoming.length} 筆單字並與現有資料合併嗎？建議先下載目前備份。`))return;const merged=dedup([...state.wordList,...incoming]);if(!storageSet(KEY,merged))return;state.wordList=merged;if(obj.history&&typeof obj.history==='object'){for(const student of ['Eason','yangyang','TestPortal']){state.history[student]={...(obj.history[student]||{}),...(state.history[student]||{})}}storageSet(HISTORY_KEY,state.history)}render();setLookupMessage(`匯入完成，目前共 ${merged.length} 筆單字。`,true)}catch(e){setLookupMessage('匯入失敗：'+e.message)}finally{$('importFile').value=''}}
+function exportData(){const data={format:'hogwarts-english-backup',version:12,exportedAt:new Date().toISOString(),vocabulary:state.wordList.filter(x=>!x.builtin),history:state.history};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='magic-english-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}
+async function importData(file){if(!file)return;try{const obj=JSON.parse(await file.text());if(obj.format!=='hogwarts-english-backup'||!Array.isArray(obj.vocabulary))throw new Error('不是此網站產生的備份檔');const incoming=dedup(obj.vocabulary.map(x=>({...x,builtin:false})));if(!incoming.length)throw new Error('備份中沒有有效單字');if(!confirm(`要匯入 ${incoming.length} 筆單字並與現有資料合併嗎？建議先下載目前備份。`))return;const merged=dedup([...state.wordList,...incoming]);if(!persistWords(merged))return;state.wordList=merged;if(obj.history&&typeof obj.history==='object'){for(const student of ['Eason','yangyang','TestPortal']){state.history[student]={...(obj.history[student]||{}),...(state.history[student]||{})}}storageSet(HISTORY_KEY,state.history)}render();setLookupMessage(`匯入完成，目前共 ${merged.length} 筆單字。`,true)}catch(e){setLookupMessage('匯入失敗：'+e.message)}finally{$('importFile').value=''}}
 
 /* ---------- 魔法裝飾 ---------- */
 function initSky(){const sky=$('sky');const n=window.innerWidth<600?45:90;for(let i=0;i<n;i++){const s=document.createElement('span');s.className='star';const sz=Math.random()<.2?3:2;s.style.cssText=`left:${Math.random()*100}%;top:${Math.random()*100}%;width:${sz}px;height:${sz}px;animation-delay:${Math.random()*3}s;animation-duration:${2+Math.random()*3}s`;sky.append(s)}}
@@ -312,7 +461,7 @@ document.addEventListener('click',e=>{if(e.target.closest&&e.target.closest('but
 /* ---------- 事件綁定 ---------- */
 function bind(){
 document.querySelectorAll('[data-student]').forEach(b=>b.addEventListener('click',()=>{state.student=b.dataset.student;render()}));
-$('soundTest').onclick=testSound;
+
 $('teacherOpen').onclick=()=>{$('pwInput').value='';$('pwMsg').textContent='';$('pwDialog').showModal();$('pwInput').focus()};
 $('pwCancel').onclick=()=>$('pwDialog').close();
 $('pwForm').addEventListener('submit',e=>{e.preventDefault();const wait=Math.ceil((pwLockUntil-Date.now())/1000);if(wait>0){$('pwMsg').textContent=`嘗試次數過多，請等待 ${wait} 秒後再試。`;return}
