@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Magic English Hub | 魔法英語學習網 v12.6</title>
+<title>Magic English Hub | 魔法英語學習網 v12.7</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cinzel:wght@600&display=swap" rel="stylesheet">
 <style>
@@ -96,8 +96,13 @@ textarea{min-height:68px;resize:vertical}
 footer{border-top:1px solid #746b70;background:#0e1d37;text-align:center;padding:16px;color:var(--pink);font-size:12px}
 button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid #d49c51;outline-offset:2px}
 
-[hidden]{display:none!important}.storage-status{margin-top:8px;opacity:.9}footer button{font-size:12px;padding:6px 10px}@media(max-width:600px){.wrap{padding:12px}header .wrap{padding:16px 12px 58px}main{padding:16px 12px}.face{min-height:300px}dialog{padding:15px}.moon,.candles{display:none}}
+.lockbox{grid-column:1/-1;max-width:380px;width:100%;margin:18px auto;padding:26px 22px;text-align:center;color:var(--ink);background:radial-gradient(ellipse at 20% 0%,#fffaf0,var(--parch1) 45%,var(--parch2));border:3px double #b8893f;border-radius:18px;box-shadow:0 10px 24px #0007,inset 0 0 38px #c9a15a66}.lockbox h3{margin:8px 0 4px;color:#192b49}.lockbox .lock-icon{font-size:44px}.lockbox input{text-align:center;font-size:22px;letter-spacing:6px;margin:12px auto;max-width:240px}.lockbox .status{margin-top:8px;color:#74151d}[hidden]{display:none!important}.storage-status{margin-top:8px;opacity:.9}footer button{font-size:12px;padding:6px 10px}@media(max-width:600px){.wrap{padding:12px}header .wrap{padding:16px 12px 58px}main{padding:16px 12px}.face{min-height:300px}dialog{padding:15px}.moon,.candles{display:none}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.trail{display:none}}
+
+.card-inner{-webkit-transform-style:preserve-3d}
+.card .face{transition:visibility 0s .375s}.card .face.back{visibility:hidden}.card.flipped .face.back{visibility:visible}.card.flipped .face.front{visibility:hidden}
+button{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+@media (pointer:coarse){.face button,.practice button{min-height:44px;font-size:13px}input,select,textarea{font-size:16px}}
 </style>
 </head>
 <body>
@@ -129,11 +134,11 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 </header>
 <main>
 <div id="storageWarn" class="warnbar" role="alert" hidden></div>
-<section class="panel"><div class="bar"><strong>🧙 選擇魔法學徒</strong><button data-student="Eason" class="active">Eason</button><button data-student="yangyang">Yangyang</button><button data-student="TestPortal">🧪 老師測試</button></div><div id="points" class="points"></div></section>
+<section class="panel"><div class="bar"><strong>🧙 選擇魔法學徒</strong><button data-student="Eason" class="active">Eason</button><button data-student="yangyang">Yangyang</button><button data-student="TestPortal">🧪 老師測試</button><button id="lockNow" class="push" hidden>🔒 鎖定</button></div><div id="points" class="points"></div></section>
 <section class="panel"><div class="bar"><strong>📜 魔法課程</strong><span id="unitButtons" class="bar"></span></div></section>
 <h2 class="heading" id="pageTitle">✨ Eason 的魔法單字</h2><p class="muted" style="text-align:center">聽發音、看定義、翻面練習例句。</p><div id="status" class="status" role="status" aria-live="polite"></div><div id="cards" class="cards"></div>
 </main>
-<footer>🪄 Magic English Hub · Eason & Yangyang · v12.6<div id="storageStatus" class="storage-status"></div><div class="bar" style="justify-content:center;margin-top:8px"><button id="footExport">⬇️ 下載成績備份</button><button id="footImport">⬆️ 還原成績備份</button></div></footer>
+<footer>🪄 Magic English Hub · Eason & Yangyang · v12.7<div id="storageStatus" class="storage-status"></div><div class="bar" style="justify-content:center;margin-top:8px"><button id="footExport">⬇️ 下載成績備份</button><button id="footImport">⬆️ 還原成績備份</button></div></footer>
 
 <dialog id="teacherDialog"><div class="bar"><h2 style="flex:1">🏰 教師管理大廳</h2><button id="teacherClose">關閉 ✕</button></div>
 <div class="notice">教師管理已加上密碼保護，可避免學生誤入。但此版本為靜態網站，密碼寫在網頁程式碼中，懂技術的人仍可查看，並非真正的安全驗證；若需要嚴格限制，需串接安全登入與雲端資料庫。請勿在公開共用裝置使用教師管理功能。</div>
@@ -142,6 +147,7 @@ button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-vis
 <label>英文例句<textarea id="editSentence" placeholder="字典沒有提供例句時，可按「產生簡單例句」或自行輸入"></textarea></label><label>例句中文翻譯（選填）<textarea id="editZh" placeholder="請輸入真正的中文翻譯"></textarea></label>
 <div class="note">字典查詢只填入確實取得的詞性與定義。字典沒有例句時，會依詞性自動產生最簡單的句型（SV 或 SVO）當作例句，請確認是否通順，也可自行改寫。美式錄音若有來源會優先使用，否則使用裝置內建 en-US 語音。</div><div class="bar"><button id="saveWord" class="primary">💾 確認並儲存</button><span id="editHint" class="small"></span></div><div id="saveMsg" class="status" role="alert" style="margin-top:8px"></div></div>
 <div class="section"><h3>📋 現有單字</h3><div id="teacherList"></div></div>
+<div class="section"><h3>🔐 學生密碼</h3><p class="small">Eason 與 Yangyang 的密碼已直接寫在程式中，選到該學生時必須輸入密碼才能練習。切換學生、重新整理、閒置 5 分鐘都會自動重新上鎖；老師測試不上鎖。密碼只用來防止同學誤點，並非嚴格的資安保護。如需更換密碼，請修改程式碼裡的 STUDENT_PINS。</p></div>
 <div class="section"><h3>🧹 學生成績管理</h3><p class="small">清除後，該學習者的發音練習紀錄、分數曲線與魔法點數會歸零，可以重新開始記錄。單字內容不會受影響。</p>
 <div class="formgrid"><label>學習者<select id="clearStudent"><option value="Eason">Eason</option><option value="yangyang">Yangyang</option><option value="TestPortal">老師測試</option><option value="*">全部學習者</option></select></label><label>範圍<select id="clearUnit"></select></label></div>
 <div id="clearInfo" class="small" style="margin:8px 0;color:#273047"></div>
@@ -306,7 +312,7 @@ const BUILTIN=BUILTIN_RAW.map(r=>({id:(r[0]==='Unit 1'&&r[1]==='Beard')?1:stable
 function isLegacySample(x){return !!x&&x.id===2&&x.unit==='Unit 1'&&normalizeWord(x.word)==='bottle'}
 const $=id=>document.getElementById(id);
 const NS='http://www.w3.org/2000/svg';
-const state={student:'Eason',unit:'Unit 1',editingId:null,wordList:[],history:{Eason:{},yangyang:{},TestPortal:{}},audio:{},speech:null,rec:null};
+const state={student:'Eason',unit:'Unit 1',editingId:null,wordList:[],history:{Eason:{},yangyang:{},TestPortal:{}},audio:{},speech:null,rec:null,unlocked:null};
 const reduceMotion=!!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches);
 
 /* ---------- 儲存 ---------- */
@@ -341,9 +347,11 @@ function displayName(st){return st==='yangyang'?'Yangyang':st==='TestPortal'?'�
 /* ---------- 發音分數 ---------- */
 const ONES=['zero','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen'],TENS=['','','twenty','thirty','forty','fifty','sixty','seventy','eighty','ninety'];
 function numWords(n){if(n<20)return ONES[n];if(n<100)return TENS[Math.floor(n/10)]+(n%10?' '+ONES[n%10]:'');return String(n)}
-function cleanText(s){return String(s).normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[-–]/g,' ').replace(/\b\d{1,2}\b/g,m=>numWords(+m)).replace(/[^a-z0-9\s']/g,'').replace(/\s+/g,' ').trim()}
+const CONTR={"i'm":'i am',"it's":'it is',"he's":'he is',"she's":'she is',"that's":'that is',"there's":'there is',"what's":'what is',"let's":'let us',"we're":'we are',"you're":'you are',"they're":'they are',"i've":'i have',"we've":'we have',"they've":'they have',"you've":'you have',"i'll":'i will',"we'll":'we will',"you'll":'you will',"they'll":'they will',"he'll":'he will',"she'll":'she will',"don't":'do not',"doesn't":'does not',"didn't":'did not',"can't":'can not',"won't":'will not',"isn't":'is not',"aren't":'are not',"wasn't":'was not',"weren't":'were not',"haven't":'have not',"hasn't":'has not',"couldn't":'could not',"wouldn't":'would not',"shouldn't":'should not'};
+function cleanText(s){return String(s).normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[’‘]/g,"'").replace(/\b[a-z]+'[a-z]+\b/g,m=>CONTR[m]||m).replace(/[-–]/g,' ').replace(/\b\d{1,2}\b/g,m=>numWords(+m)).replace(/[^a-z0-9\s']/g,'').replace(/\s+/g,' ').trim()}
 function lev(a,b){const m=a.length,n=b.length;if(!m)return n;if(!n)return m;let prev=Array.from({length:n+1},(_,j)=>j);for(let i=1;i<=m;i++){const cur=[i];for(let j=1;j<=n;j++)cur[j]=Math.min(prev[j]+1,cur[j-1]+1,prev[j-1]+(a[i-1]===b[j-1]?0:1));prev=cur}return prev[n]}
-function similarity(heard,target){const h=cleanText(heard),t=cleanText(target);if(!t)return 0;const chars=1-lev(h,t)/Math.max(h.length,t.length,1);const hw=h?h.split(' '):[],tw=t.split(' ');if(tw.length<2)return Math.max(0,chars);const words=1-lev(hw,tw)/Math.max(hw.length,tw.length,1);return Math.max(0,.6*words+.4*chars)}
+function similarity(heard,target){const h=cleanText(heard),t=cleanText(target);if(!t)return 0;const hs=h.replace(/ /g,''),ts=t.replace(/ /g,'');if(hs&&hs===ts)return 1;const chars=Math.max(1-lev(h,t)/Math.max(h.length,t.length,1),1-lev(hs,ts)/Math.max(hs.length,ts.length,1));const hw=h?h.split(' '):[],tw=t.split(' ');if(tw.length<2)return Math.max(0,chars);const words=1-lev(hw,tw)/Math.max(hw.length,tw.length,1);return Math.max(0,.6*words+.4*chars)}
+function sameText(a,b){const x=cleanText(a),y=cleanText(b);return x===y||x.replace(/ /g,'')===y.replace(/ /g,'')}
 function pronScore(heard,target,conf){const sim=similarity(heard,target);const factor=conf>0?.7+.3*conf:.9;return Math.round(Math.min(1,sim*factor)*100)}
 function feedback(score){return score>=90?'🌟 咒語完美！':score>=80?'🪄 施法成功！':score>=60?'🌙 快成功了，再試一次！':'📖 先聽一次示範，再練習看看。'}
 function entriesFor(key){return ((state.history[state.student]||{})[state.student+'_'+key])||[]}
@@ -372,7 +380,7 @@ return svg}
 function renderSpark(el){const list=scoredEntries(el.dataset.key);const name=el.dataset.kind==='word'?'單字發音':'句子發音';el.replaceChildren();const label=document.createElement('span');if(!list.length){label.textContent=name+'：尚無分數';el.append(label);return}const last=list[list.length-1].score,best=Math.max(...list.map(x=>x.score));label.textContent=`${name}｜最近 ${last}・最高 ${best}・共 ${list.length} 次`;el.append(label,scoreChart(list,true))}
 function makeSpark(key,kind){const el=make('div','spark');el.dataset.key=key;el.dataset.kind=kind;renderSpark(el);return el}
 function refreshSparks(){document.querySelectorAll('.spark').forEach(el=>renderSpark(el))}
-function renderPoints(){const pu=pointsByUnit(state.student),total=Object.values(pu).reduce((a,b)=>a+b,0);const p=$('points');p.replaceChildren();p.append(document.createTextNode(`✨ ${displayName(state.student)} 的 ${state.unit} 魔法點數：${pu[state.unit]||0}　`),make('small','',`（所有單元合計 ${total}；單次發音 90 分以上 +10、80–89 分 +5、60–79 分 +2）`))}
+function renderPoints(){if(isLocked(state.student)){const q=$('points');q.replaceChildren();q.append(document.createTextNode('🔒 '+displayName(state.student)+' 已上鎖，輸入密碼後才能練習。'));return}const pu=pointsByUnit(state.student),total=Object.values(pu).reduce((a,b)=>a+b,0);const p=$('points');p.replaceChildren();p.append(document.createTextNode(`✨ ${displayName(state.student)} 的 ${state.unit} 魔法點數：${pu[state.unit]||0}　`),make('small','',`（所有單元合計 ${total}；單次發音 90 分以上 +10、80–89 分 +5、60–79 分 +2）`))}
 
 /* ---------- 畫面 ---------- */
 function make(tag,cls,txt){const e=document.createElement(tag);if(cls)e.className=cls;if(txt!==undefined)e.textContent=txt;return e}
@@ -389,10 +397,25 @@ if(!prev&&seen)msg='⚠️ 重新整理後，瀏覽器沒有保留這個網站�
 else if(prev&&prev.entries>now)msg=`⚠️ 上次記錄有 ${prev.entries} 筆練習紀錄，現在只剩 ${now} 筆，網站資料可能被瀏覽器清除了。請用下方「還原成績備份」復原。`;
 state.boot={visits:(prev&&prev.visits?prev.visits:0)+1,msg};if(msg){const w=$('storageWarn'),had=!w.hidden;w.hidden=false;w.textContent=(had?w.textContent+' ':'')+msg}recordBoot()}
 function renderStorageStatus(){const el=$('storageStatus');if(!el)return;const where=location.protocol==='file:'?'本機檔案':location.host;el.textContent=`💾 目前這個瀏覽器已保存 ${historyCount()} 筆練習紀錄・第 ${state.boot?state.boot.visits:1} 次開啟・來源：${where}`}
+const STUDENT_PINS={Eason:'20262026',yangyang:'6767'},pinFails={},pinLock={};   // 學生密碼直接寫在程式中；老師測試不上鎖
+let IDLE_MS=300000,idleTimer=null;
+function getPin(st){return String(STUDENT_PINS[st]||'')}
+function isLocked(st){return !!getPin(st)&&state.unlocked!==st}
+function resetIdle(){clearTimeout(idleTimer);if(getPin(state.student)&&state.unlocked===state.student)idleTimer=setTimeout(()=>{if(getPin(state.student)&&state.unlocked===state.student){state.unlocked=null;render();notify('閒置超過 5 分鐘，已自動鎖定。')}},IDLE_MS)}
+['pointerdown','keydown'].forEach(ev=>document.addEventListener(ev,resetIdle,true));
+function tryUnlock(st,val,msgEl){const wait=Math.ceil(((pinLock[st]||0)-Date.now())/1000);if(wait>0){msgEl.textContent=`嘗試次數過多，請等待 ${wait} 秒後再試。`;return false}
+if(val!==''&&val===getPin(st)){pinFails[st]=0;state.unlocked=st;render();return true}
+pinFails[st]=(pinFails[st]||0)+1;if(pinFails[st]>=5){pinFails[st]=0;pinLock[st]=Date.now()+30000;msgEl.textContent='密碼錯誤太多次，請等待 30 秒後再試。'}else msgEl.textContent='密碼不對，再試一次。';return false}
+function renderLock(){const host=$('cards');host.replaceChildren();const st=state.student,box=make('div','lockbox');
+const inp=document.createElement('input');inp.type='password';inp.inputMode='numeric';inp.autocomplete='off';inp.maxLength=20;inp.placeholder='輸入密碼';inp.setAttribute('aria-label',displayName(st)+' 的密碼');
+const msg=make('div','status');msg.setAttribute('role','alert');
+const go=()=>{const v=inp.value.trim();inp.value='';if(!tryUnlock(st,v,msg))inp.focus()};
+inp.addEventListener('keydown',ev=>{if(ev.key==='Enter')go()});
+box.append(make('div','lock-icon','🔒'),make('h3','',`${displayName(st)} 的魔法單字已上鎖`),make('p','small','請輸入密碼，才能練習與記錄分數。'),inp,action('🔓 解鎖',go,'primary'),msg);host.append(box);setTimeout(()=>{try{inp.focus()}catch(e){}},50)}
 function checkStorage(){let ok=false;try{const k='__magic_probe__';localStorage.setItem(k,'1');ok=localStorage.getItem(k)==='1';localStorage.removeItem(k)}catch(e){ok=false}
 const w=$('storageWarn');if(!ok){w.hidden=false;w.textContent='⚠️ 這個瀏覽器目前無法保存學習紀錄（可能是無痕／私密模式、預覽視窗，或瀏覽器封鎖了網站資料）。重新整理或關閉網頁後，分數會消失。請改用一般視窗的 Chrome 直接開啟網站。'}}
 function init(){checkStorage();const saved=storageGet(KEY,null);const custom=(Array.isArray(saved)?saved:[]).filter(x=>!isLegacySample(x));state.wordList=dedup([...BUILTIN,...custom]);const h=storageGet(HISTORY_KEY,null);if(h&&typeof h==='object')for(const st of Object.keys(state.history))state.history[st]=h[st]||{};for(const st of Object.keys(h||{}))if(!state.history[st])state.history[st]=h[st];migrateHistory(saved);restoreUi();bootCheck();state.audio=storageGet(AUDIO_KEY,{})||{};const count=custom.length-dedup(custom).length;if(count>0)notify(`讀取時發現 ${count} 筆重複單字，已在顯示中合併。請先下載備份，再儲存新資料。`);if('speechSynthesis'in window){speechSynthesis.getVoices();speechSynthesis.addEventListener('voiceschanged',()=>speechSynthesis.getVoices())}initSky();render();bind()}
-function render(){abortSpeech();state.speech=null;saveUi();renderStorageStatus();renderTabs();renderCards();renderTeacherList();renderPoints();$('pageTitle').textContent=state.student==='TestPortal'?'🧪 老師測試入口':`✨ ${displayName(state.student)} 的魔法單字`}
+function render(){abortSpeech();state.speech=null;saveUi();renderStorageStatus();renderTabs();if(isLocked(state.student))renderLock();else renderCards();renderTeacherList();renderPoints();$('lockNow').hidden=!(getPin(state.student)&&state.unlocked===state.student);resetIdle();$('pageTitle').textContent=state.student==='TestPortal'?'🧪 老師測試入口':`✨ ${displayName(state.student)} 的魔法單字`}
 function renderTabs(){document.querySelectorAll('[data-student]').forEach(b=>{b.classList.toggle('active',b.dataset.student===state.student)});$('unitButtons').replaceChildren();const pu=pointsByUnit(state.student);for(const u of UNITS){const b=document.createElement('button');b.textContent=`${u} (${state.wordList.filter(w=>w.unit===u).length})`+(pu[u]?` ✨${pu[u]}`:'');b.classList.toggle('active',u===state.unit);b.addEventListener('click',()=>{state.unit=u;render()});$('unitButtons').append(b)}}
 function renderCards(){const host=$('cards');host.replaceChildren();const words=state.wordList.filter(w=>w.unit===state.unit);if(!words.length){host.append(make('div','empty','這個單元目前沒有單字。'));return}
 for(const item of words){
@@ -409,6 +432,7 @@ back.append(make('span','seal','✦'),make('div','small','Example Sentence'),mak
 inner.append(front,back);card.append(inner);host.append(card)}}
 
 /* ---------- 語音播放 ---------- */
+const UA=navigator.userAgent||'',IS_IOS=/iP(hone|ad|od)/.test(UA)||(/Mac/.test(navigator.platform||'')&&navigator.maxTouchPoints>1),IS_SAFARI=/^((?!chrome|chromium|android|crios|fxios|edg).)*safari/i.test(UA),IS_IOS_NON_SAFARI=IS_IOS&&!IS_SAFARI;
 function pickVoice(){if(!('speechSynthesis'in window))return null;const vs=speechSynthesis.getVoices();const us=vs.filter(v=>/^en[-_]us$/i.test(v.lang));const good=/natural|premium|enhanced|samantha|ava|allison|zira|jenny|aria/i;const local=us.filter(v=>v.localService);return local.find(v=>good.test(v.name))||local[0]||us.find(v=>good.test(v.name))||us[0]||vs.find(v=>/^en/i.test(v.lang))||null}
 function playAudio(text,audioUrl='',rate=SPEED.normal){if(!text)return;if(audioUrl&&/^https:\/\//.test(audioUrl)){const a=new Audio(audioUrl);a.preservesPitch=true;a.defaultPlaybackRate=rate;a.playbackRate=rate;let fell=false;const fb=()=>{if(!fell){fell=true;speakTTS(text,0,rate)}};a.addEventListener('error',fb);a.play().catch(fb);return}speakTTS(text,0,rate)}
 function speakTTS(text,attempt=0,rate=SPEED.normal){
@@ -420,8 +444,8 @@ const v=attempt===0?pickVoice():null;if(v)u.voice=v;
 ttsUtter=u;let started=false;   // 保留參考，避免 Chrome 提早回收而靜音
 u.onstart=()=>{started=true};
 u.onerror=ev=>{if(ev.error==='canceled'||ev.error==='interrupted')return;if(attempt===0){speakTTS(text,1,rate);return}notify('語音播放失敗（'+ev.error+'）。請檢查裝置音量與靜音開關，或到系統設定安裝 English (US) 語音。',true)};
-setTimeout(()=>{try{synth.speak(u)}catch(e){notify('無法播放語音：'+e.message,true)}},60);
-setTimeout(()=>{if(started||ttsUtter!==u)return;if(attempt===0){try{synth.cancel()}catch(e){}speakTTS(text,1,rate)}else notify('沒有聽到聲音？請檢查裝置音量與靜音開關，或到系統設定確認已安裝 English (US) 語音。',true)},2500)}
+const go=()=>{try{synth.speak(u)}catch(e){notify('無法播放語音：'+e.message,true)}};if(IS_SAFARI)go();else setTimeout(go,60);   // Safari／iOS 要求在點擊當下同步呼叫 speak
+setTimeout(()=>{if(started||ttsUtter!==u)return;if(attempt===0){try{synth.cancel()}catch(e){}speakTTS(text,1,rate)}else notify('沒有聽到聲音？請檢查裝置音量與靜音開關，或到系統設定確認已安裝 English (US) 語音。',true)},IS_SAFARI?4000:2500)}
 
 /* ---------- 口說練習（直接展開在單字卡上） ---------- */
 function abortSpeech(){if(state.rec){try{state.rec.abort()}catch(e){}state.rec=null}if('speechSynthesis'in window)speechSynthesis.cancel()}
@@ -433,20 +457,31 @@ const panel=make('div','practice'),head=make('div','practice-head');head.append(
 const target=make('p','practice-target','請朗讀：'+text),result=make('p','practice-result','點選「開始錄音」進行辨識。'),chartTitle=make('div','chart-title'),chartHost=make('div',''),hist=make('div','practice-history');
 const bar=make('div','actions');const retry=action('🎙️ 開始錄音',()=>startSpeech(),'primary');
 bar.append(action('🔊 示範・正常',()=>playAudio(text,audioUrl,SPEED.normal)),action('🐢 示範・慢速',()=>playAudio(text,audioUrl,SPEED.slow)),retry,action('📈 查看辨識紀錄',()=>showSpeechHistory()));
-panel.append(head,target,result,chartTitle,chartHost,bar,hist,make('p','small','分數依 Chrome 語音辨識的信心度與唸出文字的吻合度估算，僅供練習參考，並非專業的發音評測。需允許麥克風權限。'));
+panel.append(head,target,result,chartTitle,chartHost,bar,hist,make('p','small','分數依瀏覽器語音辨識（Chrome／Safari）的信心度與唸出文字的吻合度估算，僅供練習參考，並非專業的發音評測。需允許麥克風權限。'));
 anchor.before(panel);state.speech={text,key,kind,audioUrl,ui:{panel,target,result,chartTitle,chartHost,retry,hist}};renderSpeechChart();try{panel.scrollIntoView({block:'nearest',behavior:'smooth'})}catch(e){}}
-function startSpeech(){const sp=state.speech;if(!sp)return;const ui=sp.ui;const S=window.SpeechRecognition||window.webkitSpeechRecognition;if(!S){ui.result.textContent='這個瀏覽器不支援語音辨識，建議使用最新版 Chrome。';return}if(state.rec)return;if('speechSynthesis'in window)speechSynthesis.cancel();
-const r=new S();state.rec=r;let got=false,failed=false;ui.retry.disabled=true;r.lang='en-US';r.interimResults=false;r.maxAlternatives=1;ui.result.textContent='🎙️ 正在聆聽…';
-r.onresult=e=>{got=true;const alt=e.results[0][0],heard=alt.transcript,conf=typeof alt.confidence==='number'?alt.confidence:0;
-const ok=cleanText(heard)===cleanText(sp.text),score=pronScore(heard,sp.text,conf),pts=pointsFor(score);
-ui.result.textContent=`辨識結果：${heard}\n發音分數：${score} 分（估算）${ok?'，文字完全相符':''}　${feedback(score)}`+(pts?`\n✨ 獲得 ${pts} 魔法點數（${state.unit}）`:'');
+function startSpeech(){const sp=state.speech;if(!sp)return;const ui=sp.ui;const S=window.SpeechRecognition||window.webkitSpeechRecognition;
+if(!S){ui.result.textContent=IS_IOS_NON_SAFARI?'iPhone／iPad 上只有 Safari 支援語音辨識，請改用 Safari 開啟本網站。':'這個瀏覽器不支援語音辨識，請改用最新版 Chrome（電腦、Android）或 Safari（iPhone、iPad、Mac）。';return}
+if(state.rec)return;if('speechSynthesis'in window)speechSynthesis.cancel();
+const r=new S();state.rec=r;let got=false,failed=false,interim='',dog=null;ui.retry.disabled=true;r.lang='en-US';r.interimResults=true;r.maxAlternatives=3;ui.result.textContent='🎙️ 正在聆聽…請一口氣唸完，中途不要停頓。';
+const done=()=>{clearTimeout(dog);if(state.rec===r)state.rec=null;ui.retry.disabled=false};
+const handle=alts=>{if(state.speech!==sp)return;got=true;
+const best=alts.map(a=>({t:a.t,c:a.c,s:pronScore(a.t,sp.text,a.c)})).sort((x,y)=>y.s-x.s)[0];
+const heard=best.t,conf=best.c,score=best.s,ok=sameText(heard,sp.text),pts=pointsFor(score);
+const hw=cleanText(heard).split(' ').filter(Boolean).length,tw=cleanText(sp.text).split(' ').length,partial=!ok&&tw>2&&hw<tw*.7;
+ui.result.textContent=`辨識結果：${heard}\n發音分數：${score} 分（估算）${ok?'，文字完全相符':''}　${feedback(score)}`+(partial?'\n💡 只聽到部分句子，請一口氣唸完整句再試一次。':'')+(pts?`\n✨ 獲得 ${pts} 魔法點數（${state.unit}）`:'');
 const id=state.student+'_'+sp.key,h=state.history[state.student]||(state.history[state.student]={}),list=h[id]||(h[id]=[]);
 list.push({time:new Date().toISOString(),recognized:heard,matched:ok,score,confidence:Math.round(conf*100)/100});if(list.length>200)list.splice(0,list.length-200);
 if(!storageSet(HISTORY_KEY,state.history))ui.result.textContent+='\n⚠️ 本次紀錄未能保存';recordBoot();renderStorageStatus();
 renderSpeechChart();refreshSparks();renderPoints();renderTabs()};
-r.onerror=e=>{failed=true;ui.result.textContent=e.error==='no-speech'?'沒有聽到聲音，請靠近麥克風再試一次。':e.error==='aborted'?'':'無法辨識：'+e.error+'。請檢查麥克風權限與網路連線。'};
-r.onend=()=>{if(state.rec===r)state.rec=null;ui.retry.disabled=false;if(!got&&!failed)ui.result.textContent='沒有聽到聲音，請再試一次。'};
-try{r.start()}catch(e){state.rec=null;ui.retry.disabled=false;ui.result.textContent='無法啟動麥克風：'+e.message}}
+r.onresult=e=>{const all=Array.from(e.results),finals=all.filter(x=>x.isFinal);
+if(!finals.length){const last=all[all.length-1];if(last&&last[0]){interim=all.map(x=>x[0].transcript).join(' ').trim();ui.result.textContent='🎙️ 聽到：'+interim+' …'}return}
+if(finals.length>1){const conf=finals.map(x=>typeof x[0].confidence==='number'?x[0].confidence:0);handle([{t:finals.map(x=>x[0].transcript).join(' ').trim(),c:conf.reduce((a,b)=>a+b,0)/conf.length}]);return}
+handle(Array.from(finals[0]).map(a=>({t:a.transcript,c:typeof a.confidence==='number'?a.confidence:0})))};
+r.onerror=e=>{failed=true;const m={'no-speech':'沒有聽到聲音，請靠近麥克風再試一次。','aborted':'','audio-capture':'找不到麥克風，請確認裝置有麥克風且沒有被其他程式佔用。','network':'語音辨識需要網路連線，請確認網路後再試。','not-allowed':'麥克風被封鎖了。請允許此網站使用麥克風（網址列左側的鎖頭／設定）。','service-not-allowed':'語音辨識尚未開啟。iPhone／iPad／Mac 請到「設定」開啟 Siri 與聽寫，並允許 Safari 使用麥克風。','language-not-supported':'此裝置不支援美式英文語音辨識。'};
+ui.result.textContent=e.error in m?m[e.error]:'無法辨識：'+e.error+'。請檢查麥克風權限與網路連線。'};
+r.onend=()=>{done();if(got||failed)return;if(interim&&state.speech===sp)handle([{t:interim,c:0}]);else if(state.speech===sp)ui.result.textContent='沒有聽到聲音，請再試一次。'};
+dog=setTimeout(()=>{if(state.rec!==r)return;failed=true;try{r.abort()}catch(e){}done();if(state.speech===sp)ui.result.textContent='辨識逾時，請再按一次「開始錄音」。'},20000);
+try{r.start()}catch(e){done();ui.result.textContent='無法啟動麥克風：'+e.message}}
 function showSpeechHistory(){const sp=state.speech;if(!sp)return;const list=entriesFor(sp.key);sp.ui.hist.textContent=list.length?`共 ${list.length} 次辨識，其中 ${list.filter(x=>x.matched).length} 次文字完全相符。\n最近紀錄：\n`+list.slice(-8).map(x=>`${new Date(x.time).toLocaleString('zh-TW')}｜${typeof x.score==='number'?x.score+' 分':(x.matched?'相符':'不同')}｜${x.recognized}`).join('\n'):'尚無練習紀錄'}
 /* ---------- 教師管理：編輯單字 ---------- */
 function resetEdit(){state.editingId=null;for(const id of ['editWord','editPos','editPlural','editDefinition','editSentence','editZh'])$(id).value='';$('editHint').textContent='';$('lookupStatus').textContent='';$('saveMsg').textContent='';$('saveWord').textContent='💾 確認並儲存';$('editUnit').value=state.unit}
@@ -508,17 +543,17 @@ document.addEventListener('click',e=>{if(e.target.closest&&e.target.closest('but
 
 /* ---------- 事件綁定 ---------- */
 function bind(){
-document.querySelectorAll('[data-student]').forEach(b=>b.addEventListener('click',()=>{state.student=b.dataset.student;render()}));
+document.querySelectorAll('[data-student]').forEach(b=>b.addEventListener('click',()=>{const st=b.dataset.student;if(st!==state.student)state.unlocked=null;state.student=st;render()}));
 
 $('teacherOpen').onclick=()=>{$('pwInput').value='';$('pwMsg').textContent='';$('pwDialog').showModal();$('pwInput').focus()};
 $('pwCancel').onclick=()=>$('pwDialog').close();
 $('pwForm').addEventListener('submit',e=>{e.preventDefault();const wait=Math.ceil((pwLockUntil-Date.now())/1000);if(wait>0){$('pwMsg').textContent=`嘗試次數過多，請等待 ${wait} 秒後再試。`;return}
-if($('pwInput').value===TEACHER_PIN){pwFails=0;$('pwInput').value='';$('pwDialog').close();$('teacherDialog').showModal();resetEdit();updateClearInfo()}
+if($('pwInput').value===TEACHER_PIN){pwFails=0;$('pwInput').value='';$('pwDialog').close();$('teacherDialog').showModal();resetEdit();updateClearInfo();}
 else{pwFails++;$('pwInput').value='';if(pwFails>=5){pwFails=0;pwLockUntil=Date.now()+30000;$('pwMsg').textContent='密碼錯誤次數過多，已暫停 30 秒。'}else $('pwMsg').textContent='密碼錯誤，請再試一次。';$('pwInput').focus()}});
 $('teacherClose').onclick=()=>$('teacherDialog').close();
 $('lookup').onclick=lookupDictionary;
 $('genSentence').onclick=()=>{const w=$('editWord').value.trim();if(!validWord(w)){setLookupMessage('請先輸入正確的英文單字。');return}const t=simpleSentence(w,$('editPos').value);if(!t){setLookupMessage('請先填寫詞性（noun / verb / adjective）；其他詞性不適合自動造句，請自行填寫例句。');return}$('editSentence').value=t;$('editZh').value='';setLookupMessage('已產生簡單例句，請確認是否通順。',true)};
-$('footExport').onclick=exportData;{const o=document.createElement('option');o.value='*';o.textContent='全部單元';$('clearUnit').append(o);for(const u of UNITS){const x=document.createElement('option');x.value=u;x.textContent=u;$('clearUnit').append(x)}}$('clearStudent').onchange=updateClearInfo;$('clearUnit').onchange=updateClearInfo;$('clearBtn').onclick=clearScores;$('footImport').onclick=()=>$('importFile').click();$('saveWord').onclick=saveWord;$('resetEdit').onclick=resetEdit;$('exportBtn').onclick=exportData;$('importBtn').onclick=()=>$('importFile').click();$('importFile').onchange=e=>importData(e.target.files[0]);
+$('lockNow').onclick=()=>{state.unlocked=null;render()};$('footExport').onclick=exportData;{const o=document.createElement('option');o.value='*';o.textContent='全部單元';$('clearUnit').append(o);for(const u of UNITS){const x=document.createElement('option');x.value=u;x.textContent=u;$('clearUnit').append(x)}}$('clearStudent').onchange=updateClearInfo;$('clearUnit').onchange=updateClearInfo;$('clearBtn').onclick=clearScores;$('footImport').onclick=()=>$('importFile').click();$('saveWord').onclick=saveWord;$('resetEdit').onclick=resetEdit;$('exportBtn').onclick=exportData;$('importBtn').onclick=()=>$('importFile').click();$('importFile').onchange=e=>importData(e.target.files[0]);
 for(const u of UNITS){const o=document.createElement('option');o.value=u;o.textContent=u;$('editUnit').append(o)}$('editUnit').value=state.unit}
 init();
 </script>
